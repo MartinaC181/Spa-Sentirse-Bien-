@@ -19,24 +19,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Credenciales predefinidas
-const CREDENTIALS = {
-  admin: {
-    email: 'Admin@gmail.com',
-    password: '123',
-    nombre: 'Admin',
-    apellido: 'Admin',
-    role: 'admin' as const
-  },
-  cliente: {
-    email: 'cliente@gmail.com',
-    password: '456',
-    nombre: 'Cliente',
-    apellido: 'Cliente',
-    role: 'user' as const
-  }
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
@@ -50,39 +32,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      // Verificar credenciales del admin
-      if (email === CREDENTIALS.admin.email && password === CREDENTIALS.admin.password) {
-        const userData: User = {
-          id: '1',
-          email: CREDENTIALS.admin.email,
-          nombre: CREDENTIALS.admin.nombre,
-          apellido: CREDENTIALS.admin.apellido,
-          role: CREDENTIALS.admin.role
-        };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        return;
+      const response = await fetch(process.env.NEXT_PUBLIC_API_USER!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Credenciales inválidas');
       }
 
-      // Verificar credenciales del cliente
-      if (email === CREDENTIALS.cliente.email && password === CREDENTIALS.cliente.password) {
-        const userData: User = {
-          id: '2',
-          email: CREDENTIALS.cliente.email,
-          nombre: CREDENTIALS.cliente.nombre,
-          apellido: CREDENTIALS.cliente.apellido,
-          role: CREDENTIALS.cliente.role
-        };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        return;
-      }
+      const userData = await response.json();
+      
+      // Asegurarnos de que el usuario tenga todos los campos necesarios
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        nombre: userData.nombre,
+        apellido: userData.apellido,
+        role: userData.role || 'user', // Si no viene el rol, asumimos que es usuario normal
+      };
 
-      // Si las credenciales no coinciden con ninguna cuenta predefinida
-      throw new Error('Credenciales inválidas');
-    } catch (error) {
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user));
+    } catch (error: any) {
       console.error('Error al iniciar sesión:', error);
-      throw new Error('Credenciales inválidas');
+      throw new Error(error.message || 'Error al iniciar sesión');
     }
   };
 
