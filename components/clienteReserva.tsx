@@ -27,9 +27,8 @@ import { Input } from "../components/ui/input";
 import { useState } from "react";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import handleBooking from "../components/handleBooking";
-import { individualservices } from "../components/individualservices";
-import { groupservices } from "./groupservices";
+import useFetch from "@/hooks/useFetchServices";
+import { IService } from "@/models/interfaces";
 
 export default function ClienteReserva({
   selectedService,
@@ -67,8 +66,12 @@ export default function ClienteReserva({
     selectedTime !== undefined &&
     selectedTime !== "";
 
-  const services = [...individualservices, ...groupservices];
+  const { data, loading, error } = useFetch(process.env.NEXT_PUBLIC_API_SERVICE as string);
 
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>Error al cargar los servicios: {error}</p>;
+  if (!data || data.length === 0) return <p>No hay servicios disponibles.</p>;
+  
   const handleBooking = async (
     selectedDate: Date | undefined,
     selectedTime: string | undefined,
@@ -130,7 +133,7 @@ export default function ClienteReserva({
           <div className="mt-10 w-full flex flex-col items-center bg-[#bac4e0] px-10 py-10 rounded-xl shadow-md">
             <h2 className="text-2xl font-bold mb-6 text-center">
               Reserva tu{" "}
-              {services.find((s) => s.name === selectedService)?.name}
+              {data.find((s: { name: string; }) => s.name === selectedService)?.name}
             </h2>
 
             {/* CONTENEDOR DE FORMULARIOS */}

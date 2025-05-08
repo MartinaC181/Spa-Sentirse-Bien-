@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Button } from "../../../components/ui/button";
 import React, { useState, useRef } from "react";
 import Navbar from "../../../components/Navbar";
-import { groupservices } from "../../../components/groupservices";
 import ClienteReserva from "../../../components/clienteReserva";
 import {
   Dialog,
@@ -16,43 +15,101 @@ import {
   DialogFooter,
   DialogClose
 } from '../../../components/ui/dialog';
+import useFetch from "@/hooks/useFetchServices";
+import { IService } from "@/models/interfaces";
 
 export default function GroupServicesPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [services, setServices] = useState(groupservices);
   const [modalOpen, setModalOpen] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
   const priceRef = useRef<HTMLInputElement>(null);
+  const typeRef = useRef<HTMLSelectElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const { data, loading, error } = useFetch(process.env.NEXT_PUBLIC_API_SERVICE as string);
+
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!data) return <p>No hay datos disponibles</p>;
 
   const handleServiceClick = (serviceTitle: string) => {
     setSelectedService(prev => (prev === serviceTitle ? null : serviceTitle));
   };
 
-  const handleAddService = (e: React.FormEvent) => {
-    e.preventDefault();
-    const name = nameRef.current?.value.trim() || '';
-    const description = descRef.current?.value.trim() || '';
-    const image = imgRef.current?.value.trim() || '';
-    const price = priceRef.current?.value.trim() || '';
-    if (!name || !description || !image || !price) return;
-    setServices([
-      ...services,
-      { name, description, image, price },
-    ]);
-    setModalOpen(false);
-    if (nameRef.current) nameRef.current.value = '';
-    if (descRef.current) descRef.current.value = '';
-    if (imgRef.current) imgRef.current.value = '';
-    if (priceRef.current) priceRef.current.value = '';
-    setImagePreview(null);
+ const handleAddService = async (e: React.FormEvent) => {
+     e.preventDefault();
+     const name = nameRef.current?.value.trim() || '';
+     const description = descRef.current?.value.trim() || '';
+     const image = imgRef.current?.value.trim() || '';
+     const price = priceRef.current?.value.trim() || '';
+     const type = "Grupal";
+
+     if (!name || !description || !image || !price) {
+       alert("Todos los campos son obligatorios.");
+       return;
+     }
+ 
+     try {
+       const response = await fetch(process.env.NEXT_PUBLIC_API_SERVICE as string + '/create', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           nombre: name,
+           descripcion: description,
+           Image: image,
+           precio: price,
+           tipo: type,
+         }),
+       });
+ 
+       if (!response.ok) {
+         throw new Error("Error al agregar el servicio.");
+       }
+ 
+       alert("Servicio agregado exitosamente.");
+       setModalOpen(false);
+ 
+       // Reset form fields
+       if (nameRef.current) nameRef.current.value = '';
+       if (descRef.current) descRef.current.value = '';
+       if (imgRef.current) imgRef.current.value = '';
+       if (priceRef.current) priceRef.current.value = '';
+       setImagePreview(null);
+ 
+       // Optionally, you can refresh the data here
+       // Example: refetch data or update state
+     } catch (error) {
+       console.error(error);
+       alert("Hubo un problema al agregar el servicio.");
+     }
+   };
+
+   const handleDeleteService = async (serviceId: string) => {
+    const confirmDelete = confirm("¿Estás seguro de que deseas eliminar este servicio?");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_SERVICE as string + '/delete/' + serviceId , {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el servicio.");
+      }
+
+      alert("Servicio eliminado exitosamente.");
+      // Optionally, you can refresh the data here
+      // Example: refetch data or update state
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un problema al eliminar el servicio.");
+    }
   };
 
-  const handleDeleteService = (index: number) => {
-    setServices(services.filter((_, i) => i !== index));
-  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -114,57 +171,59 @@ export default function GroupServicesPage() {
         </div>
 
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => {
-            const isSelected = selectedService === service.name;
+          {data
+            .filter((service: IService) => service.tipo === "Grupal")
+            .map((service: IService, index: number) => {
+              const isSelected = selectedService === service.nombre;
 
-          return (
-            <li
-              key={index}
-              className={`transition-all duration-300 ${isSelected ? "lg:col-span-3 flex flex-col lg:flex-row gap-6 min-h-[620px]" : ""}`}
+              return (
+          <li
+            key={index}
+            className={`transition-all duration-300 ${isSelected ? "lg:col-span-3 flex flex-col lg:flex-row gap-6 min-h-[620px]" : ""}`}
+          >
+            {/* Servicio */}
+            <Card className={`bg-[#bac4e0] hover:shadow-lg transition-shadow duration-300 ${isSelected ? "lg:w-[60%]" : "w-full"} h-full`}>
+              <div className={`relative ${isSelected ? "relative w-full h-[250px] lg:h-[600px]" : "h-48"} w-full`}>
+                <Image
+            src={service.Image}
+            alt={service.nombre}
+            layout="fill"
+            objectFit="cover"
+            className="rounded-t-md"
+                />
+              </div>
+              <CardContent className="p-6">
+                <CardTitle className="text-xl font-bold text-[#536a86]">{service.nombre}</CardTitle>
+                <span className="block text-lg font-bold text-[#536a86] mt-1">{service.precio}</span>
+                <CardDescription className="mt-2 text-gray-500">{service.descripcion}</CardDescription>
+                <div className="flex gap-2 mt-4">
+            <Button
+              className="w-full text-[#536a86]"
+              variant={isSelected ? "default" : "outline"}
+              onClick={() => handleServiceClick(service.nombre)}
             >
-              {/* Servicio */}
-              <Card className={`bg-[#bac4e0] hover:shadow-lg transition-shadow duration-300 ${isSelected ? "lg:w-[60%]" : "w-full"} h-full`}>
-                <div className={`relative ${isSelected ? "relative w-full h-[250px] lg:h-[600px]" : "h-48"} w-full`}>
-                  <Image
-                    src={service.image}
-                    alt={service.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-t-md"
-                  />
+              {isSelected ? "Servicio Seleccionado" : "Seleccionar Servicio"}
+            </Button>
+            <Button
+              onClick={() => handleDeleteService(service._id)}
+              className="w-full text-red-600 border-red-400"
+              variant="outline"
+            >
+              Eliminar
+            </Button>
                 </div>
-                <CardContent className="p-6">
-                  <CardTitle className="text-xl font-bold text-[#536a86]">{service.name}</CardTitle>
-                  <span className="block text-lg font-bold text-[#536a86] mt-1">{service.price}</span>
-                  <CardDescription className="mt-2 text-gray-500">{service.description}</CardDescription>
-                  <div className="flex gap-2 mt-4">
-                    <Button
-                      className="w-full text-[#536a86]"
-                      variant={isSelected ? "default" : "outline"}
-                      onClick={() => handleServiceClick(service.name)}
-                      >
-                        {isSelected ? "Servicio Seleccionado" : "Seleccionar Servicio"}
-                      </Button>
-                    <Button
-                      className="w-full text-red-600 border-red-400"
-                      variant="outline"
-                      onClick={() => handleDeleteService(index)}
-                    >
-                      Eliminar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              </CardContent>
+            </Card>
 
-              {/* ClienteReserva solo si está seleccionado */}
-              {isSelected && (
-                <div className="w-full lg:w-[%40] mt-6 lg:mt-0">
-                  <ClienteReserva selectedService={selectedService} /> {/* Use service.title here? */}
-                </div>
-              )}
-            </li>
-          );
-        })}
+            {/* ClienteReserva solo si está seleccionado */}
+            {isSelected && (
+              <div className="w-full lg:w-[%40] mt-6 lg:mt-0">
+                <ClienteReserva selectedService={selectedService} />
+              </div>
+            )}
+          </li>
+              );
+            })}
         </ul>
       </div>
     </main>
