@@ -22,21 +22,26 @@ export default function Navbar() {
         </Link>
 
         {/* Menú para pantallas grandes */}
-        <div className="hidden md:flex space-x-8">
-          <Link href="/" className={pathname === '/' ? 'text-[#536a86] font-semibold' : 'hover:text-[#536a86] transition'}>
+        <div className="hidden md:flex space-x-8 items-center">
+          <Link href="/" className={`text-[#536a86] ${pathname === '/' ? 'font-semibold' : 'hover:text-[#536a86] transition'}`}>
             Inicio
           </Link>
 
           {/* Menú de Servicios: siempre visible */}
-          <Link href="/services/individual" className={pathname === '/services/individual' ? 'text-[#536a86] font-semibold' : 'hover:text-[#536a86] transition'}>
+          <Link href="/services/individual" className={`text-[#536a86] ${pathname === '/services/individual' ? 'font-semibold' : 'hover:text-[#536a86] transition'}`}>
             Individuales
           </Link>
-          <Link href="/services/group" className={pathname === '/services/group' ? 'text-[#536a86] font-semibold' : 'hover:text-[#536a86] transition'}>
+          <Link href="/services/group" className={`text-[#536a86] ${pathname === '/services/group' ? 'font-semibold' : 'hover:text-[#536a86] transition'}`}>
             Grupales
           </Link>
 
-          <Link href="/contact" className={pathname === '/contact' ? 'text-[#536a86] font-semibold' : 'hover:text-[#536a86] transition'}>
+          <Link href="/contact" className={`text-[#536a86] ${pathname === '/contact' ? 'font-semibold' : 'hover:text-[#536a86] transition'}`}>
             Contacto
+          </Link>
+
+          {/* Botón Iniciar sesión */}
+          <Link href="/login">
+            <span className="ml-4 px-4 py-2 bg-[#536a86] text-white rounded hover:bg-[#435c74] transition font-semibold">Iniciar sesión</span>
           </Link>
         </div>
 
@@ -62,6 +67,10 @@ export default function Navbar() {
           </Link>
           <Link href="/contact" className="block py-2 text-[#536a86] hover:bg-[#f6fedb] transition">
             Contacto
+          </Link>
+          {/* Botón Iniciar sesión en móvil */}
+          <Link href="/login" className="block py-2 mt-2">
+            <span className="px-4 py-2 bg-[#536a86] text-white rounded hover:bg-[#435c74] transition font-semibold">Iniciar sesión</span>
           </Link>
         </div>
       )}

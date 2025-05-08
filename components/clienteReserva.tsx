@@ -4,15 +4,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,14 +21,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
+} from "../components/ui/alert-dialog";
+import { Calendar } from "../components/ui/calendar";
+import { Input } from "../components/ui/input";
 import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import handleBooking from "@/components/handleBooking";
-import { individualservices } from "@/components/individualservices";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import handleBooking from "../components/handleBooking";
+import { individualservices } from "../components/individualservices";
 import { groupservices } from "./groupservices";
 
 export default function ClienteReserva({
@@ -67,7 +67,61 @@ export default function ClienteReserva({
     selectedTime !== undefined &&
     selectedTime !== "";
 
-  const services = individualservices.concat(groupservices);
+  const services = [...individualservices, ...groupservices];
+
+  const handleBooking = async (
+    selectedDate: Date | undefined,
+    selectedTime: string | undefined,
+    name: string,
+    email: string,
+    phone: string,
+    details: string,
+    selectedService: string | null,
+    setConfirmation: (confirmation: any) => void,
+    setOpen: (open: boolean) => void
+  ) => {
+    if (!selectedDate || !selectedTime || !selectedService) return;
+
+    try {
+      const response = await fetch('/api/turnos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: name,
+          email: email,
+          telefono: phone,
+          servicio: selectedService,
+          fecha: selectedDate,
+          hora: selectedTime,
+          detalles: details,
+          estado: 'pendiente'
+        }),
+      });
+
+      if (response.ok) {
+        setConfirmation({
+          success: true,
+          message: 'Turno reservado exitosamente'
+        });
+        setOpen(true);
+      } else {
+        setConfirmation({
+          success: false,
+          message: 'Error al reservar el turno'
+        });
+        setOpen(true);
+      }
+    } catch (error) {
+      console.error('Error al reservar:', error);
+      setConfirmation({
+        success: false,
+        message: 'Error al reservar el turno'
+      });
+      setOpen(true);
+    }
+  };
 
   return (
     <div className="flex flex-col lg:flex-row items-start justify-center gap-6">
