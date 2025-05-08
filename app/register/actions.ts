@@ -3,39 +3,32 @@
 import { redirect } from "next/navigation";
 
 export async function handleRegister(formData: FormData) {
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
-  const email = formData.get("email");
-  const password = formData.get("password");
-
-  if (!firstName || !lastName || !email || !password) {
-    throw new Error("Todos los campos son obligatorios.");
-  }
-
-  const newUser = {
-    firstName,
-    lastName,
-    email,
-    password,
-  };
-
+  const firstName = formData.get('firstName') as string;
+  const lastName = formData.get('lastName') as string;
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  console.log(firstName, lastName, email, password);
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_USER + "/register", {
-      method: "POST",
-      body: JSON.stringify(newUser),
+    const response = await fetch(process.env.NEXT_PUBLIC_API_USER + '/register', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+      }),
     });
 
-    if (response.ok) {
-      console.log("Registro exitoso. Redirigiendo...");
-      redirect("/home"); // o a /login si querés que inicie sesión después
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error en el registro");
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al registrar usuario');
     }
-  } catch (error) {
-    throw error;
+
+    return await response.json();
+  } catch (error: any) {
+    throw new Error(error.message || 'Error al registrar usuario');
   }
 }

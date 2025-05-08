@@ -5,10 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:2738331709.
 import Image from 'next/image';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from './ui/button';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin, user, logout } = useAuth();
 
   // Función para alternar el estado del menú en dispositivos móviles
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -39,10 +42,37 @@ export default function Navbar() {
             Contacto
           </Link>
 
-          {/* Botón Iniciar sesión */}
-          <Link href="/login">
-            <span className="ml-4 px-4 py-2 bg-[#536a86] text-white rounded hover:bg-[#435c74] transition font-semibold">Iniciar sesión</span>
-          </Link>
+          {/* Mostrar botón de Turnos solo si es admin */}
+          {isAdmin && (
+            <Link href="/admin/turnos">
+              <Button variant="outline" className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white">
+                Turnos
+              </Button>
+            </Link>
+          )}
+
+          {/* Mostrar nombre de usuario y botón de cerrar sesión si está autenticado */}
+          {user ? (
+            <div className="flex items-center gap-4">
+              <span className="text-[#536a86]">
+                {user.nombre} {user.apellido}
+              </span>
+              <Button 
+                variant="outline" 
+                className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white"
+                onClick={logout}
+              >
+                Cerrar Sesión
+              </Button>
+            </div>
+          ) : (
+            /* Mostrar botón de iniciar sesión si no está autenticado */
+            <Link href="/login">
+              <Button className="bg-[#536a86] text-white hover:bg-[#435c74]">
+                Iniciar Sesión
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Icono para menú móvil */}
@@ -68,10 +98,38 @@ export default function Navbar() {
           <Link href="/contact" className="block py-2 text-[#536a86] hover:bg-[#f6fedb] transition">
             Contacto
           </Link>
-          {/* Botón Iniciar sesión en móvil */}
-          <Link href="/login" className="block py-2 mt-2">
-            <span className="px-4 py-2 bg-[#536a86] text-white rounded hover:bg-[#435c74] transition font-semibold">Iniciar sesión</span>
-          </Link>
+
+          {/* Mostrar botón de Turnos solo si es admin (en móvil) */}
+          {isAdmin && (
+            <Link href="/admin/turnos" className="block py-2">
+              <Button variant="outline" className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white w-full">
+                Turnos
+              </Button>
+            </Link>
+          )}
+
+          {/* Mostrar nombre de usuario y botón de cerrar sesión si está autenticado (en móvil) */}
+          {user ? (
+            <div className="py-2">
+              <span className="block text-[#536a86] mb-2">
+                {user.nombre} {user.apellido}
+              </span>
+              <Button 
+                variant="outline" 
+                className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white w-full"
+                onClick={logout}
+              >
+                Cerrar Sesión
+              </Button>
+            </div>
+          ) : (
+            /* Mostrar botón de iniciar sesión si no está autenticado (en móvil) */
+            <Link href="/login" className="block py-2">
+              <Button className="bg-[#536a86] text-white hover:bg-[#435c74] w-full">
+                Iniciar Sesión
+              </Button>
+            </Link>
+          )}
         </div>
       )}
     </nav>
