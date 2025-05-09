@@ -38,7 +38,7 @@ export default function LoginPage() {
       
       // Esperar un momento para mostrar el mensaje de éxito antes de redirigir
       setTimeout(() => {
-        router.push('/admin/turnos');
+        router.push('/');
       }, 1000);
     } catch (error) {
       console.error('Error en el inicio de sesión:', error);
