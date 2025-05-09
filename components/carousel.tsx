@@ -4,7 +4,7 @@ CarouselContent,
 CarouselItem,
 CarouselNext,
 CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "../components/ui/carousel";
 import React, { useRef, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
