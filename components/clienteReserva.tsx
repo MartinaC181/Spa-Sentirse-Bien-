@@ -5,31 +5,54 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { useAuth } from '@/contexts/AuthContext';
 import { Notification } from './ui/notification';
-import { useRouter } from 'next/navigation';
+import { IService, IUser } from '@/models/interfaces';
 
 interface ClienteReservaProps {
-  selectedService: string | null;
+  selectedService: string;
 }
 
 export default function ClienteReserva({ selectedService }: ClienteReservaProps) {
+  const [correo, setCorreo] = useState('');
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
-  const [detalles, setDetalles] = useState('');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const { user } = useAuth();
-  const router = useRouter();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
+    if (!correo) {
       setNotification({
-        message: "Debes iniciar sesión para hacer una reserva",
+        message: "Por favor, ingresa un correo electrónico",
         type: "error"
       });
       return;
+    }
+
+    let fetchedUser: IUser;
+
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_USER! + '/correo/' + correo, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener el usuario');
+      }
+
+      fetchedUser = await response.json();
+
+    } catch (error) {
+      console.error('Error:', error);
+      setNotification({
+        message: "Error al obtener el usuario",
+        type: "error"
+      });
+      return; 
     }
 
     if (!fecha || !hora) {
@@ -40,20 +63,51 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
       return;
     }
 
+    let service: IService;
+
     try {
-      const response = await fetch('/api/turnos/create', {
+      if (!process.env.NEXT_PUBLIC_API_SERVICE || !selectedService) {
+        setNotification({
+          message: "Error: Configuración del servicio no encontrada",
+          type: "error"
+        });
+        return;
+      }
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVICE}/name/${selectedService}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener el servicio');
+      }
+      service = await response.json();
+
+    } catch (error) {
+      console.error('Error:', error);
+      setNotification({
+        message: "Error al obtener el servicio",
+        type: "error"
+      });
+      return;
+    }
+    
+    try {
+      const body = {
+        cliente: fetchedUser._id,
+        servicio: service._id,
+        fecha,
+        hora
+      };
+
+      const response = await fetch(process.env.NEXT_PUBLIC_API_TURNO! + '/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          nombre: `${user.nombre} ${user.apellido}`,
-          email: user.email,
-          servicio: selectedService,
-          fecha,
-          hora,
-          detalles,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -65,10 +119,9 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
         type: "success"
       });
 
-      // Limpiar el formulario
+      setCorreo('');
       setFecha('');
       setHora('');
-      setDetalles('');
     } catch (error) {
       console.error('Error:', error);
       setNotification({
@@ -77,27 +130,6 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
       });
     }
   };
-
-  if (!user) {
-    return (
-      <Card className="bg-[#bac4e0] border-2 border-[#536a86]">
-        <CardHeader>
-          <CardTitle className="text-[#536a86]">Reserva de Servicio</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center space-y-4">
-            <p className="text-[#536a86]">Para hacer una reserva, debes iniciar sesión</p>
-            <Button 
-              onClick={() => router.push('/login')}
-              className="bg-[#536a86] text-white hover:bg-[#435c74]"
-            >
-              Iniciar Sesión
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className="bg-[#bac4e0] border-2 border-[#536a86]">
@@ -113,6 +145,19 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="correo" className="text-[#536a86]">Correo Electrónico</Label>
+            <Input
+              id="correo"
+              placeholder='Tu correo electrónico'
+              type="email"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
+              className="bg-white border-[#536a86]"
+              required
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="fecha" className="text-[#536a86]">Fecha</Label>
             <Input
@@ -134,18 +179,6 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
               onChange={(e) => setHora(e.target.value)}
               className="bg-white border-[#536a86]"
               required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="detalles" className="text-[#536a86]">Detalles adicionales</Label>
-            <Input
-              id="detalles"
-              type="text"
-              value={detalles}
-              onChange={(e) => setDetalles(e.target.value)}
-              placeholder="Especificaciones o preferencias"
-              className="bg-white border-[#536a86]"
             />
           </div>
 
