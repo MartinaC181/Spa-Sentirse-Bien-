@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 
+
+
 export async function handleLogin(formData: FormData) {
   const email = formData.get("email")?.toString().trim();
   const password = formData.get("password")?.toString().trim();
@@ -15,7 +17,7 @@ export async function handleLogin(formData: FormData) {
   const user = { email, password };
 
   try {
-    const request = await fetch(process.env.NEXT_PUBLIC_API_USER + "/login", {
+    const request = await fetch(process.env.NEXT_PUBLIC_API_USER! + "/login", {
       body: JSON.stringify(user),
       method: "POST",
       headers: {

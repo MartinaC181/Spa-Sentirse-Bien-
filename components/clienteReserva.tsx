@@ -102,6 +102,8 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
         hora
       };
 
+      console.log('Body:', body);
+
       const response = await fetch(process.env.NEXT_PUBLIC_API_TURNO! + '/create', {
         method: 'POST',
         headers: {
