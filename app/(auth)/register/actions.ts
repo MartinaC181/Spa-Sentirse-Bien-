@@ -9,7 +9,7 @@ export async function handleRegister(formData: FormData) {
   const password = formData.get('password') as string;
   console.log(firstName, lastName, email, password);
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_USER + '/register', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_USER! + '/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -22,13 +22,17 @@ export async function handleRegister(formData: FormData) {
       }),
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error al registrar usuario');
+    if (response.ok) {
+      console.log("Registro exitoso. Redirigiendo...");
+      redirect("/");
+    } else {
+      const errorResponse = await response.json();
+      console.error("Error en la API:", errorResponse);
+      throw new Error(errorResponse.message || "Error en el registro");
     }
-
-    return await response.json();
-  } catch (error: any) {
-    throw new Error(error.message || 'Error al registrar usuario');
+  
+  } catch (error) {
+    console.error("Error en handleLogin:", error);
+    throw error;
   }
 }

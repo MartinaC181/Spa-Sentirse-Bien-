@@ -27,7 +27,7 @@ export default function RegisterPage() {
         message: "Registro exitoso. Redirigiendo al inicio de sesión...",
         type: "success"
       });
-      
+
       // Esperar un momento para mostrar el mensaje de éxito antes de redirigir
       setTimeout(() => {
         router.push('/login');
@@ -53,7 +53,7 @@ export default function RegisterPage() {
             onClose={() => setNotification(null)}
           />
         )}
-        
+
         <Card className="w-full max-w-md bg-[#bac4e0] border-2 border-[#536a86]">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center text-[#536a86]">
@@ -87,7 +87,7 @@ export default function RegisterPage() {
                   disabled={isLoading}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-[#536a86]">Correo Electrónico</Label>
                 <Input
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                   disabled={isLoading}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-[#536a86]">Contraseña</Label>
                 <Input
@@ -114,13 +114,24 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-[#536a86] text-white hover:bg-[#435570] transition-colors"
-                disabled={isLoading}
-              >
-                {isLoading ? "Registrando..." : "Registrarse"}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  type="submit"
+                  className="w-full bg-[#536a86] text-white hover:bg-[#435570] transition-colors"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Registrando..." : "Registrarse"}
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => { /* Handle Google login */ }}
+                  className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f0f0f0] flex items-center justify-center gap-2"
+                >
+                  <img src="/google-icon.png" alt="Google" className="w-10 h-10" />
+                  Registrarse con Google
+                </Button>
+              </div>
 
               <div className="text-center text-[#536a86]">
                 ¿Ya tienes cuenta?{' '}

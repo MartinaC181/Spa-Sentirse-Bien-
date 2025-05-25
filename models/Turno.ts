@@ -1,20 +1,18 @@
 import mongoose from 'mongoose';
 
 const turnoSchema = new mongoose.Schema({
-  nombre: {
-    type: String,
-    required: true
-  },
   email: {
     type: String,
     required: true
   },
-  telefono: {
-    type: String,
+  cliente: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   servicio: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Service',
     required: true
   },
   fecha: {

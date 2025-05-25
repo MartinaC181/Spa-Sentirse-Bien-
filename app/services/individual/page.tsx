@@ -222,7 +222,7 @@ export default function IndividualServicesPage() {
                     </div>
                     <CardContent className="p-6">
                       <CardTitle className="text-xl font-bold text-[#536a86]">{service.nombre}</CardTitle>
-                      <span className="block text-lg font-bold text-[#536a86] mt-1">{service.precio}</span>
+                        <span className="block text-lg font-bold text-[#536a86] mt-1">${service.precio}</span>
                       <CardDescription className="mt-2 text-gray-500">{service.descripcion}</CardDescription>
                       <div className="flex gap-2 mt-4">
                         <Button

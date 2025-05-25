@@ -28,11 +28,10 @@ export default function GroupServicesPage() {
   const descRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
   const priceRef = useRef<HTMLInputElement>(null);
-  const typeRef = useRef<HTMLSelectElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const { isAdmin } = useAuth();
-  const { data, loading, error, refetch, updateData } = useFetch(process.env.NEXT_PUBLIC_API_SERVICE as string);
+  const { data, loading, error, updateData } = useFetch(process.env.NEXT_PUBLIC_API_SERVICE as string);
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -219,7 +218,7 @@ export default function GroupServicesPage() {
                     </div>
                     <CardContent className="p-6">
                       <CardTitle className="text-xl font-bold text-[#536a86]">{service.nombre}</CardTitle>
-                      <span className="block text-lg font-bold text-[#536a86] mt-1">{service.precio}</span>
+                        <span className="block text-lg font-bold text-[#536a86] mt-1">${service.precio}</span>
                       <CardDescription className="mt-2 text-gray-500">{service.descripcion}</CardDescription>
                       <div className="flex gap-2 mt-4">
                         <Button

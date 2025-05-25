@@ -1,17 +1,15 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { IUser } from '@/models/interfaces';
 
-interface User {
-  id: string;
-  email: string;
-  role: 'admin' | 'user';
-  nombre: string;
-  apellido: string;
+interface LoginResponse {
+  token: string;
+  user: Omit<IUser, 'password'>;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: IUser | null;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -19,26 +17,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Credenciales predefinidas
-const CREDENTIALS = {
-  admin: {
-    email: 'Admin@gmail.com',
-    password: '123',
-    nombre: 'Admin',
-    apellido: 'Admin',
-    role: 'admin' as const
-  },
-  cliente: {
-    email: 'cliente@gmail.com',
-    password: '456',
-    nombre: 'Cliente',
-    apellido: 'Cliente',
-    role: 'user' as const
-  }
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
 
   useEffect(() => {
     // Verificar si hay un usuario guardado en localStorage
@@ -50,48 +30,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      // Verificar credenciales del admin
-      if (email === CREDENTIALS.admin.email && password === CREDENTIALS.admin.password) {
-        const userData: User = {
-          id: '1',
-          email: CREDENTIALS.admin.email,
-          nombre: CREDENTIALS.admin.nombre,
-          apellido: CREDENTIALS.admin.apellido,
-          role: CREDENTIALS.admin.role
-        };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        return;
+      const requestBody = {
+        email,
+        password,
+      };
+      console.log('URL de la API:', process.env.NEXT_PUBLIC_API_USER);
+      console.log('Datos enviados al servidor:', requestBody);
+      
+      const response = await fetch(process.env.NEXT_PUBLIC_API_USER + "/login"!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('Status de la respuesta:', response.status);
+      console.log('Headers de la respuesta:', Object.fromEntries(response.headers.entries()));
+      const responseText = await response.text();
+      console.log('Respuesta en texto:', responseText);
+      
+      if (!response.ok) {
+        if (response.status === 500) {
+          console.error('Error del servidor:', responseText);
+          throw new Error('Error interno del servidor. Por favor, contacta al administrador.');
+        }
+        throw new Error(responseText || 'Credenciales inválidas');
       }
 
-      // Verificar credenciales del cliente
-      if (email === CREDENTIALS.cliente.email && password === CREDENTIALS.cliente.password) {
-        const userData: User = {
-          id: '2',
-          email: CREDENTIALS.cliente.email,
-          nombre: CREDENTIALS.cliente.nombre,
-          apellido: CREDENTIALS.cliente.apellido,
-          role: CREDENTIALS.cliente.role
-        };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        return;
+      let responseData: LoginResponse;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Error al parsear la respuesta como JSON:', e);
+        throw new Error('La respuesta del servidor no es un JSON válido');
       }
 
-      // Si las credenciales no coinciden con ninguna cuenta predefinida
-      throw new Error('Credenciales inválidas');
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      throw new Error('Credenciales inválidas');
+      // Asegurarnos de que el usuario tenga todos los campos necesarios
+      const user: IUser = {
+        _id: responseData.user._id,
+        email: responseData.user.email,
+        first_name: responseData.user.first_name,
+        last_name: responseData.user.last_name,
+        password: '', // No guardamos la contraseña en el frontend
+        is_admin: responseData.user.is_admin,
+        role: responseData.user.role || 'cliente',
+      };
+
+      console.log('Usuario procesado:', user);
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', responseData.token);
+    } catch (error: any) {
+      console.error('Error detallado al iniciar sesión:', error);
+      throw new Error(error.message || 'Error al iniciar sesión');
     }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.is_admin || user?.role === 'admin';
 
   return (
     <AuthContext.Provider value={{ user, isAdmin, login, logout }}>
@@ -106,4 +108,4 @@ export function useAuth() {
     throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   }
   return context;
-} 
+}
