@@ -105,7 +105,7 @@ export default function LoginPage() {
               </Button>
               <Button
                 type="button"
-                onClick={() => { /* Handle Google login */ }}
+                onClick={() => { router.push("https://spa-back-dvdm.onrender.com/auth/login/google"); }}
                 className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f0f0f0] flex items-center justify-center gap-2"
               >
                 <Image src="/google-icon.png" alt="Google" width={40} height={40} className="w-10 h-10" />
