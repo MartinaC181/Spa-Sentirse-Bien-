@@ -54,6 +54,7 @@
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.1",
     "next": "15.2.3",
+    "next-auth": "^4.24.11",
     "npm": "^11.3.0",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",

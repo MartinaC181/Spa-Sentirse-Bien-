@@ -36,7 +36,6 @@ export default function GroupServicesPage() {
   const descRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
   const priceRef = useRef<HTMLInputElement>(null);
-  const typeRef = useRef<HTMLSelectElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const { isAdmin } = useAuth();

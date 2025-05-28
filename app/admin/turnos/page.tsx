@@ -1,6 +1,11 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import {
   Table,
@@ -10,47 +15,73 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import AdminRoute from '@/components/AdminRoute';
-import Navbar from '@/components/Navbar';
-
-interface Turno {
-  _id: string;
-  nombre: string;
-  email: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  detalles?: string;
-  estado: 'pendiente' | 'confirmado' | 'cancelado';
-}
-
-const turnos: Turno[] = [
-  {
-    _id: '1',
-    nombre: 'Juan Pérez',
-    email: 'juan@example.com',
-    telefono: '123456789',
-    servicio: 'Masaje relajante',
-    fecha: '2024-06-10T00:00:00.000Z',
-    hora: '10:00',
-    estado: 'pendiente',
-  },
-  {
-    _id: '2',
-    nombre: 'Ana López',
-    email: 'ana@example.com',
-    telefono: '987654321',
-    servicio: 'Facial',
-    fecha: '2024-06-11T00:00:00.000Z',
-    hora: '12:00',
-    estado: 'confirmado',
-  },
-];
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import AdminRoute from "@/components/AdminRoute";
+import Navbar from "@/components/Navbar";
+import { ITurno } from "@/models/interfaces";
+import useFetch from "@/hooks/useFetchServices";
+import { useState } from "react";
 
 export default function AdminTurnosPage() {
+  const { data, loading, error, refetch } = useFetch(
+    process.env.NEXT_PUBLIC_API_TURNO!
+  );
+  const turnos: ITurno = data;
+  const [processing, setProcessing] = useState(false);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este turno?")) return;
+
+    setProcessing(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_TURNO}/delete/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el turno");
+      }
+
+      alert("Turno eliminado correctamente");
+      refetch();
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error al eliminar el turno");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleConfirm = async (id: string) => {
+    setProcessing(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_TURNO}/edit/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ estado: "confirmado" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al confirmar el turno");
+      }
+
+      alert("Turno confirmado correctamente");
+      refetch();
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error al confirmar el turno");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!turnos) return <p>No hay turnos disponibles</p>;
+
   return (
     <AdminRoute>
       <main className="min-h-screen bg-[#f6fedb]">
@@ -68,53 +99,52 @@ export default function AdminTurnosPage() {
                     <TableHead>Hora</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Servicio</TableHead>
-                    <TableHead>Contacto</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {turnos.map((turno) => (
-                    <TableRow key={turno._id}>
+                  {turnos.map((turno: ITurno, index: number) => (
+                    <TableRow key={index}>
                       <TableCell>
-                        {format(new Date(turno.fecha), 'PPP', { locale: es })}
+                        {format(new Date(turno.fecha), "PPP", { locale: es })}
                       </TableCell>
                       <TableCell>{turno.hora}</TableCell>
-                      <TableCell>{turno.nombre}</TableCell>
-                      <TableCell>{turno.servicio}</TableCell>
+                      <TableCell>{turno.cliente?.email}</TableCell>
+                      <TableCell>{turno.servicio?.nombre}</TableCell>
                       <TableCell>
-                        <div>
-                          <p>{turno.email}</p>
-                          <p>{turno.telefono}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-sm ${
-                          turno.estado === 'confirmado' 
-                            ? 'bg-green-100 text-green-800'
-                            : turno.estado === 'cancelado'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-sm ${
+                            turno.estado === "confirmado"
+                              ? "bg-green-100 text-green-800"
+                              : turno.estado === "cancelado"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
                           {turno.estado}
                         </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          {turno.estado === 'pendiente' && (
+                          {turno.estado === "pendiente" && (
                             <>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="bg-green-500 text-white hover:bg-green-600"
+                                onClick={() => handleConfirm(turno._id.toString())}
+                                disabled={processing}
                               >
-                                Confirmar
+                                {processing ? "Procesando..." : "Confirmar"}
                               </Button>
                               <Button
                                 variant="destructive"
                                 size="sm"
+                                onClick={() => handleDelete(turno._id.toString())}
+                                disabled={processing}
                               >
-                                Cancelar
+                                {processing ? "Procesando..." : "Cancelar"}
                               </Button>
                             </>
                           )}
@@ -130,4 +160,4 @@ export default function AdminTurnosPage() {
       </main>
     </AdminRoute>
   );
-} 
+}
