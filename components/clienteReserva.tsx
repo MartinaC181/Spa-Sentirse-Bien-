@@ -14,6 +14,7 @@ interface ClienteReservaProps {
 }
 
 export default function ClienteReserva({ selectedService }: ClienteReservaProps) {
+  const [correo, setCorreo] = useState('');
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
   const [detalles, setDetalles] = useState('');
@@ -40,7 +41,7 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
       return;
     }
 
-    if (!selectedService.length) {
+    if (!selectedService || !selectedService.length) {
       setNotification({
         message: "Selecciona al menos un servicio",
         type: "error",
@@ -55,8 +56,8 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nombre: `${user.nombre} ${user.apellido}`,
-          email: user.email,
+          nombre: `${user?.first_name} ${user?.last_name}`,
+          email: user?.email ?? "",
           servicio: selectedService,
           fecha,
           hora,
@@ -115,55 +116,57 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
           onClose={() => setNotification(null)}
         />
       )}
-      <CardHeader>
-        <CardTitle className="text-[#536a86]">Reserva de Servicio</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="fecha" className="text-[#536a86]">Fecha</Label>
-            <Input
-              id="fecha"
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              className="bg-white border-[#536a86]"
-              required
-            />
-          </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-[#536a86]">Reserva de Servicio</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fecha" className="text-[#536a86]">Fecha</Label>
+              <Input
+                id="fecha"
+                type="date"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+                className="bg-white border-[#536a86]"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="hora" className="text-[#536a86]">Hora</Label>
-            <Input
-              id="hora"
-              type="time"
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              className="bg-white border-[#536a86]"
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="hora" className="text-[#536a86]">Hora</Label>
+              <Input
+                id="hora"
+                type="time"
+                value={hora}
+                onChange={(e) => setHora(e.target.value)}
+                className="bg-white border-[#536a86]"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="detalles" className="text-[#536a86]">Detalles adicionales</Label>
-            <Input
-              id="detalles"
-              type="text"
-              value={detalles}
-              onChange={(e) => setDetalles(e.target.value)}
-              placeholder="Especificaciones o preferencias"
-              className="bg-white border-[#536a86]"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="detalles" className="text-[#536a86]">Detalles adicionales</Label>
+              <Input
+                id="detalles"
+                type="text"
+                value={detalles}
+                onChange={(e) => setDetalles(e.target.value)}
+                placeholder="Especificaciones o preferencias"
+                className="bg-white border-[#536a86]"
+              />
+            </div>
 
-          <Button 
-            type="submit" 
-            className="w-full bg-[#536a86] text-white hover:bg-[#435c74]"
-          >
-            Reservar
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <Button 
+              type="submit" 
+              className="w-full bg-[#536a86] text-white hover:bg-[#435c74]"
+            >
+              Reservar
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   );
 }

@@ -15,6 +15,11 @@ const turnoSchema = new mongoose.Schema({
     ref: 'Service',
     required: true
   },
+  profesional: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   fecha: {
     type: Date,
     required: true

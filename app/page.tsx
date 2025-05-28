@@ -9,6 +9,27 @@ import Footer from "../components/footer";
 
 export default function Home() {
 
+  const profesionales = [
+    {
+      nombre: "Carolina Paz",
+      email: "carolina.paz@sentirsebien.com",
+      titulo: "Lic. en Kinesiología y Fisiatría",
+      experiencia: "10 años en masoterapia y rehabilitación física. Especialista en masajes descontracturantes y piedras calientes.",
+    },
+    {
+      nombre: "Sofía Giménez",
+      email: "sofia.gimenez@sentirsebien.com",
+      titulo: "Técnica en Estética Corporal y Facial",
+      experiencia: "7 años en tratamientos de belleza facial y corporal. Experta en criofrecuencia, ultracavitación y lifting de pestañas.",
+    },
+    {
+      nombre: "María Vera",
+      email: "maria.vera@sentirsebien.com",
+      titulo: "Profesora de Yoga Certificada",
+      experiencia: "12 años enseñando yoga grupal e individual. Formación en técnicas de relajación y meditación para el bienestar emocional.",
+    },
+  ];
+
   return (
     <main className="bg-[#f6fedb] text-[#536a86]">
       <Navbar />
@@ -71,6 +92,32 @@ export default function Home() {
               Ver Grupales
             </button>
           </Link>
+        </div>
+      </section>
+      { /* Sección de profesionales */}
+      <section className="bg-[#f0f8ff] py-10">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-[#536a86] mb-10">
+            Conocé a Nuestro Equipo Profesional
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {profesionales.map((profe, idx) => (
+              <div
+                key={idx}
+                className="bg-white shadow-lg rounded-2xl p-6 border border-[#bac4e0]"
+              >
+                <h3 className="text-xl font-semibold text-[#536a86]">{profe.nombre}</h3>
+                <p className="text-sm text-gray-700 italic mb-2">{profe.titulo}</p>
+                <p className="text-gray-800 text-sm mb-4">{profe.experiencia}</p>
+                <a
+                  href={`mailto:${profe.email}`}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  {profe.email}
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

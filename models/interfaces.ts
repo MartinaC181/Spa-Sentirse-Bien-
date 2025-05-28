@@ -17,7 +17,7 @@ export interface IUser {
   last_name: string;
   password: string;
   is_admin: boolean;
-  role: 'admin' | 'cliente';
+  role: 'admin' | 'cliente' | 'profesional';
 }
 
 export interface ITurno {
@@ -25,6 +25,7 @@ export interface ITurno {
   _id: ObjectId;
   cliente?: IUser, 
   servicio?: IService, 
+  profesional?: IUser,
   fecha: Date,
   hora: string,
   estado: 'pendiente' | 'confirmado' | 'cancelado' | 'realizado',
