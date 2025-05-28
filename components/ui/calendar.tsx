@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "../../src/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "../../src/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({
   className,
@@ -19,12 +19,14 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       disabled={(date) => {
-        // Deshabilitar fechas antes de hoy
+        // Calcular la fecha mínima seleccionable (dos días después de hoy)
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
-        // Deshabilitar domingos (getDay() devuelve 0 para domingo)
-        return date < today || date.getDay() === 0;
+        const minDate = new Date(today);
+        minDate.setDate(today.getDate() + 2);
+
+        // Deshabilitar si es antes de minDate o si es domingo
+        return date < minDate || date.getDay() === 0;
       }}
       className={cn("p-3", className)}
       classNames={{
@@ -34,7 +36,7 @@ function Calendar({
         caption_label: "text-sm font-medium",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
-          buttonVariants({ variant: "outline" }),
+          buttonVariants({ variant: "o||||utline" }),
           "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
         nav_button_previous: "absolute left-1",
@@ -71,8 +73,8 @@ function Calendar({
       }}
       {...props}
     />
-  )
+  );
 }
-Calendar.displayName = "Calendar"
+Calendar.displayName = "Calendar";
 
-export { Calendar }
+export { Calendar };
