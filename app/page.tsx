@@ -8,25 +8,27 @@ import CarouselServices from "../components/carousel";
 import Footer from "../components/footer";
 
 export default function Home() {
-
   const profesionales = [
     {
       nombre: "Carolina Paz",
       email: "carolina.paz@sentirsebien.com",
       titulo: "Lic. en Kinesiología y Fisiatría",
-      experiencia: "10 años en masoterapia y rehabilitación física. Especialista en masajes descontracturantes y piedras calientes.",
+      experiencia:
+        "10 años en masoterapia y rehabilitación física. Especialista en masajes descontracturantes y piedras calientes.",
     },
     {
       nombre: "Sofía Giménez",
       email: "sofia.gimenez@sentirsebien.com",
       titulo: "Técnica en Estética Corporal y Facial",
-      experiencia: "7 años en tratamientos de belleza facial y corporal. Experta en criofrecuencia, ultracavitación y lifting de pestañas.",
+      experiencia:
+        "7 años en tratamientos de belleza facial y corporal. Experta en criofrecuencia, ultracavitación y lifting de pestañas.",
     },
     {
       nombre: "María Vera",
       email: "maria.vera@sentirsebien.com",
       titulo: "Profesora de Yoga Certificada",
-      experiencia: "12 años enseñando yoga grupal e individual. Formación en técnicas de relajación y meditación para el bienestar emocional.",
+      experiencia:
+        "12 años enseñando yoga grupal e individual. Formación en técnicas de relajación y meditación para el bienestar emocional.",
     },
   ];
 
@@ -38,9 +40,7 @@ export default function Home() {
         className="h-screen flex items-center justify-center bg-cover bg-center relative"
         style={{ backgroundImage: "url(/logo2.png)" }}
       >
-
         <div className="absolute inset-0 bg-[#f6fedb]/80 backdrop-blur-sm" />
-
 
         <div className="relative z-10 text-center px-6 max-w-3xl">
           <h1 className="text-5xl sm:text-6xl font-serif font-semibold text-[#536a86] mb-6 tracking-wide drop-shadow-md">
@@ -74,7 +74,6 @@ export default function Home() {
         </div>
       </section>
 
-
       <section className="py-16 px-6 md:px-20 bg-[#f6fedb] text-center">
         <h2 className="text-3xl font-serif mb-10">¿Qué servicios ofrecemos?</h2>
         <div className="px-6 flex justify-center">
@@ -94,24 +93,38 @@ export default function Home() {
           </Link>
         </div>
       </section>
-      { /* Sección de profesionales */}
-      <section className="bg-[#f0f8ff] py-10">
+      {/* Sección de profesionales */}
+      <section className="py-16 px-6 md:px-20 bg-[#fff]">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-[#536a86] mb-10">
+          <h2 className="text-3xl font-serif font-semibold text-center text-[#536a86] mb-10 drop-shadow-sm">
             Conocé a Nuestro Equipo Profesional
           </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {profesionales.map((profe, idx) => (
               <div
                 key={idx}
-                className="bg-white shadow-lg rounded-2xl p-6 border border-[#bac4e0]"
+                className="bg-white shadow-xl rounded-2xl p-8 border border-[#bac4e0] transition-transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center"
               >
-                <h3 className="text-xl font-semibold text-[#536a86]">{profe.nombre}</h3>
-                <p className="text-sm text-gray-700 italic mb-2">{profe.titulo}</p>
-                <p className="text-gray-800 text-sm mb-4">{profe.experiencia}</p>
+                <div className="w-20 h-20 rounded-full bg-[#bac4e0] flex items-center justify-center mb-4 shadow-md">
+                  <span className="text-3xl font-bold text-[#536a86]">
+                    {profe.nombre
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-[#536a86] mb-1">
+                  {profe.nombre}
+                </h3>
+                <p className="text-sm text-[#7a8ca5] italic mb-2">
+                  {profe.titulo}
+                </p>
+                <p className="text-gray-700 text-sm mb-4">
+                  {profe.experiencia}
+                </p>
                 <a
                   href={`mailto:${profe.email}`}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm text-[#008080] hover:underline hover:text-[#005f5f] transition"
                 >
                   {profe.email}
                 </a>

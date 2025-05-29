@@ -47,6 +47,7 @@
     "embla-carousel-react": "^8.6.0",
     "express": "^5.1.0",
     "firebase": "^11.3.0",
+    "framer-motion": "^12.15.0",
     "genkit": "^1.0.4",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
