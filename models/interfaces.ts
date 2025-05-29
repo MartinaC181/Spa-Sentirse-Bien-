@@ -11,7 +11,7 @@ export interface IService {
 }
 
 export interface IUser {
-  _id: ObjectId;
+  _id?: ObjectId;
   email: string;
   first_name: string;
   last_name: string;

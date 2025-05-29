@@ -8,16 +8,14 @@ import {
   ReactNode,
 } from "react";
 import { IUser } from "@/models/interfaces";
-import { ObjectId } from "mongoose";
 
 interface LoginResponse {
   user: {
-    _id: ObjectId;
     email: string;
     first_name?: string;
     last_name?: string;
     is_admin?: boolean;
-    role?: 'admin' | 'cliente' | 'profesional';
+    role?: "admin" | "cliente" | "profesional";
   };
   token: string;
 }
@@ -33,126 +31,60 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
-  const [usuarioId, setUsuarioId] = useState< ObjectId | null>(null);
 
   useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    try {
-      const parsed = JSON.parse(storedUser);
-      // Validar o completar campos faltantes
-      console.log("Usuario recuperado del localStorage:", parsed);
-      const usuario: IUser = {
-        _id: parsed.id,
-        email: parsed.email,
-        first_name: parsed.first_name || "",
-        last_name: parsed.last_name || "",
-        password: "", // nunca debe persistirse
-        is_admin: parsed.is_admin || false,
-        role: parsed.role || "cliente",
-      };
-      setUser(usuario);
-    } catch (e) {
-      console.error("Error al parsear usuario del localStorage", e);
-    }
-  }
-}, []);
-
-useEffect(() => {
-  const fetchUserId = async () => {
-    if (!user?.email) return;
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_USER}`);
-      if (!res.ok) throw new Error("No se pudieron obtener los usuarios");
-
-      const usuarios = await res.json();
-      const usuarioEncontrado = usuarios.find((u: any) => u.email === user.email);
-      if (usuarioEncontrado) {
-        setUsuarioId(usuarioEncontrado._id);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        const usuario: IUser = {
+          email: parsed.email,
+          first_name: parsed.first_name || "",
+          last_name: parsed.last_name || "",
+          password: "",
+          is_admin: parsed.is_admin || false,
+          role: parsed.role || "cliente",
+        };
+        setUser(usuario);
+      } catch (e) {
+        console.error("Error al parsear usuario del localStorage", e);
       }
-    } catch (error) {
-      console.error("Error al buscar el ID del usuario:", error);
     }
-  };
-
-  fetchUserId();
-}, [user?.email]);
-
-console.log("ID del usuario:", usuarioId);
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const requestBody = {
-        email,
-        password,
-      };
-      console.log("URL de la API:", process.env.NEXT_PUBLIC_API_USER);
-      console.log("Datos enviados al servidor:", requestBody);
-
       const response = await fetch(
-        process.env.NEXT_PUBLIC_API_USER + "/login"!,
+        `${process.env.NEXT_PUBLIC_API_USER}/login`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
         }
       );
 
-      console.log("Status de la respuesta:", response.status);
-      console.log(
-        "Headers de la respuesta:",
-        Object.fromEntries(response.headers.entries())
-      );
       const responseText = await response.text();
-      console.log("Respuesta en texto:", responseText);
+      if (!response.ok) throw new Error(responseText || "Credenciales inválidas");
 
-      if (!response.ok) {
-        if (response.status === 500) {
-          console.error("Error del servidor:", responseText);
-          throw new Error(
-            "Error interno del servidor. Por favor, contacta al administrador."
-          );
-        }
-        throw new Error(responseText || "Credenciales inválidas");
-      }
+      const responseData: LoginResponse = JSON.parse(responseText);
 
-      let responseData: LoginResponse;
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Error al parsear la respuesta como JSON:", e);
-        throw new Error("La respuesta del servidor no es un JSON válido");
-      }
-      console.log("Datos de la respuesta:", responseData);
-
-      // Asegurarnos de que el usuario tenga todos los campos necesarios
-      if (!usuarioId) {
-        throw new Error("No se pudo obtener el ID del usuario.");
-      }
       const user: IUser = {
-        _id: usuarioId,
         email: responseData.user.email,
         first_name: responseData.user.first_name || "",
         last_name: responseData.user.last_name || "",
-        password: "", // No guardamos la contraseña
+        password: "",
         is_admin: responseData.user.is_admin || false,
         role: responseData.user.role || "cliente",
       };
-      
 
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", responseData.token);
     } catch (error: any) {
-      console.error("Error detallado al iniciar sesión:", error);
+      console.error("Error al iniciar sesión:", error);
       throw new Error(error.message || "Error al iniciar sesión");
     }
   };
-
-  console.log("Usuario actual:", user);
 
   const logout = () => {
     setUser(null);
@@ -171,8 +103,8 @@ console.log("ID del usuario:", usuarioId);
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth debe ser usado dentro de un AuthProvider");
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de AuthProvider");
   }
   return context;
 }

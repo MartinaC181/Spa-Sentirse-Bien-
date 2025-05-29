@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -10,31 +10,61 @@ import { Notification } from './ui/notification';
 import { useRouter } from 'next/navigation';
 import useFetch from '@/hooks/useFetchServices';
 import { IUser } from '@/models/interfaces';
+import { Calendar } from './ui/calendar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 interface ClienteReservaProps {
   selectedService: string | null;
+  onCloseService: () => void;
 }
 
-
-export default function ClienteReserva({ selectedService }: ClienteReservaProps) {
-  const [fecha, setFecha] = useState('');
+export default function ClienteReserva({ selectedService, onCloseService }: ClienteReservaProps) {
+  const [fecha, setFecha] = useState<Date | undefined>(undefined);
   const [hora, setHora] = useState('');
   const [profesional, setProfesional] = useState('');
+  const [usuarioId, setUsuarioId] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
 
   const { data } = useFetch(process.env.NEXT_PUBLIC_API_USER!);
   const profesionales = (data || []).filter((item: any) => item.role === 'profesional');
 
-  
-  
+  useEffect(() => {
+    if (selectedService) {
+      setModalOpen(true);
+    }
+  }, [selectedService]);
+
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      if (!user?.email) return;
+
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_USER!);
+        if (!res.ok) throw new Error("No se pudieron obtener los usuarios");
+
+        const usuarios = await res.json();
+        const usuarioEncontrado = usuarios.find((u: any) => u.email === user.email);
+        if (usuarioEncontrado) {
+          setUsuarioId(usuarioEncontrado._id);
+        }
+      } catch (error) {
+        console.error("Error al buscar el ID del usuario:", error);
+      }
+    };
+
+    fetchUserId();
+  }, [user?.email]);
+
+  console.log("ID del usuario:", usuarioId);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("usuario :", user);
-
-    if (!user?.email) {
+    if (!user) {
       setNotification({
         message: "Debes iniciar sesión para hacer una reserva",
         type: "error"
@@ -45,56 +75,56 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
     if (!fecha || !hora) {
       setNotification({
         message: "Por favor, selecciona fecha y hora",
-        type: "error",
-      });
-      return;
-    }
-
-    if (!selectedService || !selectedService.length) {
-      setNotification({
-        message: "Selecciona al menos un servicio",
-        type: "error",
+        type: "error"
       });
       return;
     }
 
     try {
       const body = JSON.stringify({
-        cliente: user._id,
+        cliente: usuarioId,
         servicio: selectedService,
         profesional,
-        fecha,
+        fecha: fecha ? fecha.toISOString().split('T')[0] : '',
         hora,
       });
-      console.log("Body de la reserva:", body);
+
       const response = await fetch(process.env.NEXT_PUBLIC_API_TURNO! + '/create', {
         method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body,
       });
 
-      if (!response.ok) {
-        throw new Error("Error al crear la reserva");
-      }
+      if (!response.ok) throw new Error('Error al crear la reserva');
 
+      // Mostrar primero la notificación (no desmontar todavía)
       setNotification({
         message: "Reserva creada exitosamente",
-        type: "success",
+        type: "success"
       });
 
-      // Limpiar el formulario
-      setFecha('');
-      setHora('');
-      setProfesional('');
+      // Esperar a que se vea la notificación y luego desmontar
+      setTimeout(() => {
+        setModalOpen(false);
+        onCloseService();
+        setFecha(undefined);
+        setHora('');
+        setProfesional('');
+        setNotification(null); // limpiar la notificación después
+      }, 2500);
     } catch (error) {
       setNotification({
         message: "Error al crear la reserva",
         type: "error",
       });
+
+      setTimeout(() => {
+        setModalOpen(false);
+        onCloseService();
+        setNotification(null);
+      }, 2500);
     }
-  };
+  }
 
   if (!user) {
     return (
@@ -119,28 +149,27 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
 
   return (
     <>
-      {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification(null)}
-        />
-      )}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-[#536a86]">Reserva de Servicio</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reserva de Servicio</DialogTitle>
+          </DialogHeader>
+          {notification && (
+            <div className="absolute left-0 right-0 top-0 z-50 flex justify-center pointer-events-none">
+              <Notification
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification(null)}
+              />
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="fecha" className="text-[#536a86]">Fecha</Label>
-              <Input
-                id="fecha"
-                type="date"
-                value={fecha}
-                onChange={(e) => setFecha(e.target.value)}
-                className="bg-white border-[#536a86]"
-                required
+              <Calendar
+                mode="single"
+                selected={fecha}
+                onSelect={setFecha}
               />
             </div>
 
@@ -159,18 +188,18 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
             <div className="space-y-2">
               <Label htmlFor="profesional" className="text-[#536a86]">Profesional</Label>
               <select
-              id="profesional"
-              value={profesional}
-              onChange={(e) => setProfesional(e.target.value)}
-              className="w-full p-2 rounded border border-[#536a86] bg-white"
-              required
+                id="profesional"
+                value={profesional}
+                onChange={(e) => setProfesional(e.target.value)}
+                className="w-full p-2 rounded border border-[#536a86] bg-white"
+                required
               >
-              <option value="">Selecciona un profesional</option>
-              {profesionales.map((p: IUser) => (
-                <option key={String(p._id)} value={String(p._id)}>
-                {p.first_name} {p.last_name}
-                </option>
-              ))}
+                <option value="">Selecciona un profesional</option>
+                {profesionales.map((p: IUser) => (
+                  <option key={String(p._id)} value={String(p._id)}>
+                    {p.first_name} {p.last_name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -181,8 +210,10 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
               Reservar
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+
+

@@ -320,7 +320,7 @@ export default function GroupServicesPage() {
 
                   {isSelected && (
                     <div className="w-full lg:w-[%40] mt-6 lg:mt-0">
-                      <ClienteReserva selectedService={selectedService} />
+                      <ClienteReserva selectedService={selectedService} onCloseService={() => setSelectedService(null)} />
                     </div>
                   )}
                 </li>
