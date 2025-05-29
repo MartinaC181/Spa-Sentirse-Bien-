@@ -24,6 +24,7 @@ import useFetch from "@/hooks/useFetchServices";
 import { IService } from "@/models/interfaces";
 import { Notification } from "../../../components/ui/notification";
 import { useAuth } from "@/contexts/AuthContext";
+import { ObjectId } from "mongoose";
 
 export default function GroupServicesPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -47,9 +48,9 @@ export default function GroupServicesPage() {
   if (error) return <p>Error: {error}</p>;
   if (!data) return <p>No hay datos disponibles</p>;
 
-  const handleServiceClick = (serviceTitle: string) => {
-    setSelectedService((prev) => (prev === serviceTitle ? null : serviceTitle));
-  };
+  const handleServiceClick = (serviceId: string) => {
+  setSelectedService((prev) => (prev === serviceId ? null : serviceId));
+};
 
   const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +113,7 @@ export default function GroupServicesPage() {
     }
   };
 
-  const handleDeleteService = async (serviceId: string) => {
+  const handleDeleteService = async (serviceId: ObjectId) => {
     const confirmDelete = confirm(
       "¿Estás seguro de que deseas eliminar este servicio?"
     );
@@ -253,7 +254,7 @@ export default function GroupServicesPage() {
           {data
             .filter((service: IService) => service.tipo === "Grupal")
             .map((service: IService, index: number) => {
-              const isSelected = selectedService === service.nombre;
+              const isSelected = selectedService === String(service._id);
 
               return (
                 <li
@@ -298,7 +299,7 @@ export default function GroupServicesPage() {
                         <Button
                           className="w-full text-[#536a86]"
                           variant={isSelected ? "default" : "outline"}
-                          onClick={() => handleServiceClick(service.nombre)}
+                          onClick={() => handleServiceClick(String(service._id))}
                         >
                           {isSelected
                             ? "Servicio Seleccionado"

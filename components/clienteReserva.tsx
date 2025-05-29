@@ -8,29 +8,38 @@ import { Label } from './ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { Notification } from './ui/notification';
 import { useRouter } from 'next/navigation';
+import useFetch from '@/hooks/useFetchServices';
+import { IUser } from '@/models/interfaces';
 
 interface ClienteReservaProps {
   selectedService: string | null;
 }
 
+
 export default function ClienteReserva({ selectedService }: ClienteReservaProps) {
-  const [correo, setCorreo] = useState('');
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
-  const [detalles, setDetalles] = useState('');
+  const [profesional, setProfesional] = useState('');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { user } = useAuth();
   const router = useRouter();
 
+  const { data } = useFetch(process.env.NEXT_PUBLIC_API_USER!);
+  const profesionales = (data || []).filter((item: any) => item.role === 'profesional');
+
+  
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!correo) {
+    console.log("usuario :", user);
+
+    if (!user?.email) {
       setNotification({
         message: "Debes iniciar sesión para hacer una reserva",
         type: "error"
       });
-      return; 
+      return;
     }
 
     if (!fecha || !hora) {
@@ -50,19 +59,20 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
     }
 
     try {
-      const response = await fetch('/api/turnos/create', {
+      const body = JSON.stringify({
+        cliente: user._id,
+        servicio: selectedService,
+        profesional,
+        fecha,
+        hora,
+      });
+      console.log("Body de la reserva:", body);
+      const response = await fetch(process.env.NEXT_PUBLIC_API_TURNO! + '/create', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          nombre: `${user?.first_name} ${user?.last_name}`,
-          email: user?.email ?? "",
-          servicio: selectedService,
-          fecha,
-          hora,
-          detalles,
-        }),
+        body,
       });
 
       if (!response.ok) {
@@ -77,7 +87,7 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
       // Limpiar el formulario
       setFecha('');
       setHora('');
-      setDetalles('');
+      setProfesional('');
     } catch (error) {
       setNotification({
         message: "Error al crear la reserva",
@@ -95,7 +105,7 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
         <CardContent>
           <div className="text-center space-y-4">
             <p className="text-[#536a86]">Para hacer una reserva, debes iniciar sesión</p>
-            <Button 
+            <Button
               onClick={() => router.push('/login')}
               className="bg-[#536a86] text-white hover:bg-[#435c74]"
             >
@@ -147,19 +157,25 @@ export default function ClienteReserva({ selectedService }: ClienteReservaProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="detalles" className="text-[#536a86]">Detalles adicionales</Label>
-              <Input
-                id="detalles"
-                type="text"
-                value={detalles}
-                onChange={(e) => setDetalles(e.target.value)}
-                placeholder="Especificaciones o preferencias"
-                className="bg-white border-[#536a86]"
-              />
+              <Label htmlFor="profesional" className="text-[#536a86]">Profesional</Label>
+              <select
+              id="profesional"
+              value={profesional}
+              onChange={(e) => setProfesional(e.target.value)}
+              className="w-full p-2 rounded border border-[#536a86] bg-white"
+              required
+              >
+              <option value="">Selecciona un profesional</option>
+              {profesionales.map((p: IUser) => (
+                <option key={String(p._id)} value={String(p._id)}>
+                {p.first_name} {p.last_name}
+                </option>
+              ))}
+              </select>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-[#536a86] text-white hover:bg-[#435c74]"
             >
               Reservar

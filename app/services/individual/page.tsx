@@ -19,6 +19,7 @@ import useFetch from "@/hooks/useFetchServices";
 import { IService } from "@/models/interfaces";
 import { Notification } from "../../../components/ui/notification";
 import { useAuth } from '@/contexts/AuthContext';
+import { ObjectId } from "mongoose";
 
 export default function IndividualServicesPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -37,13 +38,9 @@ export default function IndividualServicesPage() {
   if (error) return <p>Error al cargar los servicios: {error}</p>;
   if (!data || data.length === 0) return <p>No hay servicios disponibles.</p>;
 
-  const handleServiceClick = (serviceName: string) => { 
-    if (selectedService === serviceName) {
-      setSelectedService(null);
-    } else {
-      setSelectedService(serviceName);
-    }
-  };
+  const handleServiceClick = (serviceId: string) => {
+  setSelectedService((prev) => (prev === serviceId ? null : serviceId));
+};
 
   const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +100,7 @@ export default function IndividualServicesPage() {
     }
   };
 
-  const handleDeleteService = async (serviceId: string) => {
+  const handleDeleteService = async (serviceId: ObjectId) => {
     const confirmDelete = confirm("¿Estás seguro de que deseas eliminar este servicio?");
     if (!confirmDelete) return;
 
@@ -203,8 +200,7 @@ export default function IndividualServicesPage() {
           {data
             .filter((service: IService) => service.tipo === "Individual")
             .map((service: IService, index: number) => {
-              const isSelected = selectedService === service.nombre;
-
+              const isSelected = selectedService === String(service._id);
               return (
                 <li
                   key={index}
@@ -228,7 +224,7 @@ export default function IndividualServicesPage() {
                         <Button
                           className="w-full text-[#536a86]"
                           variant={isSelected ? "default" : "outline"}
-                          onClick={() => handleServiceClick(service.nombre)}
+                          onClick={() => handleServiceClick(String(service._id))}
                         >
                           {isSelected ? "Servicio Seleccionado" : "Seleccionar Servicio"}
                         </Button>

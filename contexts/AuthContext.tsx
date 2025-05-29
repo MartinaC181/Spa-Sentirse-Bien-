@@ -8,13 +8,18 @@ import {
   ReactNode,
 } from "react";
 import { IUser } from "@/models/interfaces";
+import { ObjectId } from "mongoose";
 
-interface User {
-  id: string;
-  email: string;
-  role: "admin" | "user";
-  nombre: string;
-  apellido: string;
+interface LoginResponse {
+  user: {
+    _id: ObjectId;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    is_admin?: boolean;
+    role?: 'admin' | 'cliente' | 'profesional';
+  };
+  token: string;
 }
 
 interface AuthContextType {
@@ -28,14 +33,53 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
+  const [usuarioId, setUsuarioId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Verificar si hay un usuario guardado en localStorage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+      // Validar o completar campos faltantes
+      console.log("Usuario recuperado del localStorage:", parsed);
+      const usuario: IUser = {
+        _id: parsed.id,
+        email: parsed.email,
+        first_name: parsed.first_name || "",
+        last_name: parsed.last_name || "",
+        password: "", // nunca debe persistirse
+        is_admin: parsed.is_admin || false,
+        role: parsed.role || "cliente",
+      };
+      setUser(usuario);
+    } catch (e) {
+      console.error("Error al parsear usuario del localStorage", e);
     }
-  }, []);
+  }
+}, []);
+
+useEffect(() => {
+  const fetchUserId = async () => {
+    if (!user?.email) return;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_USER}`);
+      if (!res.ok) throw new Error("No se pudieron obtener los usuarios");
+
+      const usuarios = await res.json();
+      const usuarioEncontrado = usuarios.find((u: any) => u.email === user.email);
+      if (usuarioEncontrado) {
+        setUsuarioId(usuarioEncontrado._id);
+      }
+    } catch (error) {
+      console.error("Error al buscar el ID del usuario:", error);
+    }
+  };
+
+  fetchUserId();
+}, [user?.email]);
+
+console.log("ID del usuario:", usuarioId);
 
   const login = async (email: string, password: string) => {
     try {
@@ -82,15 +126,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Error al parsear la respuesta como JSON:", e);
         throw new Error("La respuesta del servidor no es un JSON válido");
       }
+      console.log("Datos de la respuesta:", responseData);
 
       // Asegurarnos de que el usuario tenga todos los campos necesarios
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        nombre: userData.nombre,
-        apellido: userData.apellido,
-        role: userData.role || "user", // Si no viene el rol, asumimos que es usuario normal
+      const user: IUser = {
+        _id: usuarioId as unknown as IUser["_id"],
+        email: responseData.user.email,
+        first_name: responseData.user.first_name || "",
+        last_name: responseData.user.last_name || "",
+        password: "", // No guardamos la contraseña
+        is_admin: responseData.user.is_admin || false,
+        role: responseData.user.role || "cliente",
       };
+      
 
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
@@ -101,13 +149,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  console.log("Usuario actual:", user);
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   };
 
-  const isAdmin = user?.is_admin || user?.role === "admin";
+  const isAdmin = user?.role === "profesional" || user?.role === "admin";
 
   return (
     <AuthContext.Provider value={{ user, isAdmin, login, logout }}>
