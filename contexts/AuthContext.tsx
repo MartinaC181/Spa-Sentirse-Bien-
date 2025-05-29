@@ -33,7 +33,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
-  const [usuarioId, setUsuarioId] = useState<string | null>(null);
+  const [usuarioId, setUsuarioId] = useState< ObjectId | null>(null);
 
   useEffect(() => {
   const storedUser = localStorage.getItem("user");
@@ -129,8 +129,11 @@ console.log("ID del usuario:", usuarioId);
       console.log("Datos de la respuesta:", responseData);
 
       // Asegurarnos de que el usuario tenga todos los campos necesarios
+      if (!usuarioId) {
+        throw new Error("No se pudo obtener el ID del usuario.");
+      }
       const user: IUser = {
-        _id: usuarioId as unknown as IUser["_id"],
+        _id: usuarioId,
         email: responseData.user.email,
         first_name: responseData.user.first_name || "",
         last_name: responseData.user.last_name || "",
