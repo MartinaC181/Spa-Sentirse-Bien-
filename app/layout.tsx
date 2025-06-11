@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientAuthProvider from "@/components/ClientAuthProvider";
+import Chatbot from "@/components/chatbot";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={inter.className}>
         <ClientAuthProvider>
+          <Chatbot />
           {children}
         </ClientAuthProvider>
       </body>

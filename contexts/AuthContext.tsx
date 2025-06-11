@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("token");
   };
 
-  const isAdmin = user?.role === "profesional" || user?.role === "admin";
+  const isAdmin = user?.role === "admin";
 
   return (
     <AuthContext.Provider value={{ user, isAdmin, login, logout }}>
