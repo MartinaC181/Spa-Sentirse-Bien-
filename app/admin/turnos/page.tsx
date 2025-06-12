@@ -110,7 +110,7 @@ export default function AdminTurnosPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ estado: "confirmado" }),
+          body: JSON.stringify({ estado: "Confirmado" }),
         }
       );
 
