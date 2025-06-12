@@ -44,7 +44,7 @@ const Chatbot: React.FC = () => {
             console.error("Error enviando el mensaje:", error);
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", content: "Error al contactar con el servidor del chatbot. Por favor, intenta más tarde." },
+                { role: "bot", content: "Error al contactar con el servidor del chatbot. Por favor, intente más tarde." },
             ]);
         }
 
