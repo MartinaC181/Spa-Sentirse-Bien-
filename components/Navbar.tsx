@@ -30,9 +30,8 @@ export default function Navbar() {
         <div className="hidden md:flex space-x-8 items-center">
           <Link
             href="/"
-            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${
-              pathname === "/" ? "font-semibold" : ""
-            } group`}
+            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${pathname === "/" ? "font-semibold" : ""
+              } group`}
           >
             Inicio
             <span
@@ -46,9 +45,8 @@ export default function Navbar() {
           </Link>
           <Link
             href="/services/individual"
-            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${
-              pathname === "/services/individual" ? "font-semibold" : ""
-            } group`}
+            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${pathname === "/services/individual" ? "font-semibold" : ""
+              } group`}
           >
             Individuales
             <span
@@ -62,9 +60,8 @@ export default function Navbar() {
           </Link>
           <Link
             href="/services/group"
-            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${
-              pathname === "/services/group" ? "font-semibold" : ""
-            } group`}
+            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${pathname === "/services/group" ? "font-semibold" : ""
+              } group`}
           >
             Grupales
             <span
@@ -78,9 +75,8 @@ export default function Navbar() {
           </Link>
           <Link
             href="/contact"
-            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${
-              pathname === "/contact" ? "font-semibold" : ""
-            } group`}
+            className={`relative text-[#536a86] transition-all duration-300 px-2 py-1 ${pathname === "/contact" ? "font-semibold" : ""
+              } group`}
           >
             Contacto
             <span
@@ -104,10 +100,21 @@ export default function Navbar() {
             </Link>
           )}
 
+          {user?.role === "profesional" && (
+            <Link href="/profesional/turnos">
+              <Button
+                variant="outline"
+                className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white transition-all duration-300 shadow-none hover:shadow-lg hover:scale-105"
+              >
+                Mis Turnos
+              </Button>
+            </Link>
+          )}
+
           {user ? (
             <div className="flex items-center gap-4">
               <span className="text-[#536a86]">
-                {user.nombre} {user.apellido}
+                {user.first_name} {user.last_name}
               </span>
               <Button
                 variant="outline"
@@ -137,9 +144,8 @@ export default function Navbar() {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            className={`w-6 h-6 transition-transform duration-300 ${
-              isOpen ? "rotate-90" : ""
-            }`}
+            className={`w-6 h-6 transition-transform duration-300 ${isOpen ? "rotate-90" : ""
+              }`}
           >
             <path
               strokeLinecap="round"
@@ -205,11 +211,26 @@ export default function Navbar() {
                 </Button>
               </Link>
             )}
+            {user?.role === "profesional" && (
+              <Link
+                href="/profesional/turnos"
+                className="block py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <Button
+                  variant="outline"
+                  className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white w-full transition-all duration-300"
+                >
+                  Mis Turnos
+                </Button>
+              </Link>
+            )}
+
 
             {user ? (
               <div className="py-2">
                 <span className="block text-[#536a86] mb-2">
-                  {user.nombre} {user.apellido}
+                  {user.first_name} {user.last_name}
                 </span>
                 <Button
                   variant="outline"

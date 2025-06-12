@@ -13,12 +13,21 @@ import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
 
 export default function ContactPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isComplete, setIsComplete] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     setIsComplete(
@@ -32,7 +41,9 @@ export default function ContactPage() {
     setName("");
     setEmail("");
     setMessage("");
+    setShowModal(true);
   };
+
 
   return (
     <main className="min-h-screen bg-[#f6fedb] text-[#536a86] flex flex-col">
@@ -41,7 +52,7 @@ export default function ContactPage() {
       <div className="flex flex-col lg:flex-row items-center justify-center flex-grow p-8 gap-16 max-w-7xl mx-auto">
         {/* FORMULARIO DE CONTACTO */}
         <div className="w-full lg:w-[60%] flex flex-col items-center">
-          
+
           <h1 className="text-4xl font-bold mb-8 text-center text-[#536a86]">
             Contáctanos
           </h1>
@@ -86,17 +97,17 @@ export default function ContactPage() {
                       required
                     />
                   </div>
-                  <Button
+                    <Button
                     type="submit"
                     className={`w-full transition-colors ${
                       isComplete
-                        ? "bg-blue-600 hover:bg-blue-700 text-white"
-                        : "bg-blue-200 text-blue-400 cursor-not-allowed"
+                      ? "bg-[#bac4e0] hover:bg-[#a9b3e7] text-white"
+                      : "bg-[#bbbbe0] text-[#614f91] cursor-not-allowed"
                     }`}
                     disabled={!isComplete}
-                  >
+                    >
                     Enviar
-                  </Button>
+                    </Button>
                 </form>
               </CardContent>
             </Card>
@@ -111,6 +122,24 @@ export default function ContactPage() {
           />
         </div>
 
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-[#536a86]">Mensaje enviado</DialogTitle>
+            </DialogHeader>
+            <p className="text-[#536a86]">
+              Gracias por tu mensaje. Nos pondremos en contacto pronto.
+            </p>
+            <DialogFooter>
+              <Button
+                className="bg-[#536a86] text-white hover:bg-[#435c74]"
+                onClick={() => setShowModal(false)}
+              >
+                Cerrar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </main>
   );

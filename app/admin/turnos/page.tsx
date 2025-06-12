@@ -60,14 +60,9 @@ export default function AdminTurnosPage() {
 
   const turnosFiltrados = useMemo(() => {
     return turnos.filter((t: ITurno) => {
-      const fecha: string | Date = t.fecha as string | Date;
+      const fechaTurno = t.fecha ? format(new Date(t.fecha), "yyyy-MM-dd") : "";
       const coincideFecha =
-        !filtroFecha ||
-        (typeof fecha === "string"
-          ? fecha.startsWith(filtroFecha)
-          : fecha instanceof Date
-          ? fecha.toISOString().startsWith(filtroFecha)
-          : false);
+        !filtroFecha || fechaTurno === filtroFecha;
       const coincideServicio =
         !filtroServicio || t.servicio?.nombre === filtroServicio;
       const coincideProfesional =
