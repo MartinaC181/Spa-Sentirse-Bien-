@@ -119,7 +119,7 @@ const Chatbot: React.FC = () => {
                                                         .then(data => {
                                                             setMessages((prev) => [
                                                                 ...prev,
-                                                                { role: "bot", content: data.reply || "No tengo una respuesta para eso." },
+                                                                { role: "bot", content: data.reply || "No tengo una respuesta para eso, lo siento." },
                                                             ]);
                                                         })
                                                         .catch(() => {
