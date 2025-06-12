@@ -44,7 +44,7 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
 
       try {
         const res = await fetch(process.env.NEXT_PUBLIC_API_USER!);
-        if (!res.ok) throw new Error("No se pudieron obtener los usuarios");
+        if (!res.ok) throw new Error("No se pudo obtener los usuarios");
 
         const usuarios = await res.json();
         const usuarioEncontrado = usuarios.find((u: any) => u.email === user.email);
