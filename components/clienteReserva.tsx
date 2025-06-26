@@ -101,6 +101,15 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [datosComprobante, setDatosComprobante] = useState<any>(null);
 
+  // Cambiar el onChange del input de vencimiento para formatear MM/AA automáticamente
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^\d]/g, '');
+    if (value.length > 2) {
+      value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    setCardExpiry(value.slice(0, 5));
+  };
+
   // Modificar handleSubmit para mostrar modal de confirmación y guardar datos
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -342,7 +351,7 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
             <div className="flex gap-2">
               <div className="flex-1 space-y-2">
                 <Label htmlFor="cardExpiry" className="text-[#536a86] font-semibold text-xs uppercase tracking-wide">Vencimiento (MM/AA)</Label>
-                <Input id="cardExpiry" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)} maxLength={5} required />
+                <Input id="cardExpiry" value={cardExpiry} onChange={handleExpiryChange} maxLength={5} required />
               </div>
               <div className="flex-1 space-y-2">
                 <Label htmlFor="cardCvv" className="text-[#536a86] font-semibold text-xs uppercase tracking-wide">CVV</Label>
