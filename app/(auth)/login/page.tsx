@@ -11,6 +11,7 @@ import { Notification } from '@/components/ui/notification';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 
 export default function LoginPage() {
@@ -63,64 +64,72 @@ export default function LoginPage() {
           />
         )}
 
-        <Card className="w-full max-w-md bg-[#bac4e0] border-2 border-[#536a86]">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center text-[#536a86]">
-              Iniciar Sesión
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-[#536a86]">Correo Electrónico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ejemplo@correo.com"
-                  className="bg-white border-[#536a86]"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#536a86]">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="bg-white border-[#536a86]"
-                  required
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-[#536a86] text-white hover:bg-[#435570] transition-colors"
-              >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8 }}
+          className="w-full max-w-md"
+        >
+          <Card className="w-full bg-[#bac4e0] border-2 border-[#536a86]">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center text-[#536a86]">
                 Iniciar Sesión
-              </Button>
-              <Button
-                type="button"
-                onClick={() => { router.push("https://spa-back-dvdm.onrender.com/auth/login/google"); }}
-                className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f0f0f0] flex items-center justify-center gap-2"
-              >
-                <Image src="/google-icon.png" alt="Google" width={40} height={40} className="w-10 h-10" />
-                Iniciar Sesión con Google
-              </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-[#536a86]">Correo Electrónico</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ejemplo@correo.com"
+                    className="bg-white border-[#536a86]"
+                    required
+                  />
+                </div>
 
-              <div className="text-center text-[#536a86]">
-                ¿No tienes cuenta?{' '}
-                <Link href="/register" className="text-[#536a86] hover:text-[#435570] font-semibold">
-                  Regístrate
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-[#536a86]">Contraseña</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="bg-white border-[#536a86]"
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-[#536a86] text-white hover:bg-[#435570] transition-colors"
+                >
+                  Iniciar Sesión
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => { router.push("https://spa-back-dvdm.onrender.com/auth/login/google"); }}
+                  className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f0f0f0] flex items-center justify-center gap-2"
+                >
+                  <Image src="/google-icon.png" alt="Google" width={40} height={40} className="w-10 h-10" />
+                  Iniciar Sesión con Google
+                </Button>
+
+                <div className="text-center text-[#536a86]">
+                  ¿No tienes cuenta?{' '}
+                  <Link href="/register" className="text-[#536a86] hover:text-[#435570] font-semibold">
+                    Regístrate
+                  </Link>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </motion.div>
       </main>
     </>
   );

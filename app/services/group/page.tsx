@@ -25,6 +25,7 @@ import { IService } from "@/models/interfaces";
 import { Notification } from "../../../components/ui/notification";
 import { useAuth } from "@/contexts/AuthContext";
 import { ObjectId } from "mongoose";
+import { motion } from "framer-motion";
 
 export default function GroupServicesPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -169,17 +170,41 @@ export default function GroupServicesPage() {
         />
       )}
       <Navbar />
-      <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold text-center mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        className="container mx-auto py-10"
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl font-bold text-center mb-8"
+        >
           Servicios Grupales
-        </h1>
-        <p className="mb-6 text-center">
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-6 text-center"
+        >
           Disfruta de nuestras experiencias de spa en conjunto con otras
           personas.
-        </p>
+        </motion.p>
 
         {isAdmin && (
-          <div className="flex justify-end mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex justify-end mb-6"
+          >
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-[#536a86] text-white">
@@ -247,7 +272,7 @@ export default function GroupServicesPage() {
                 </form>
               </DialogContent>
             </Dialog>
-          </div>
+          </motion.div>
         )}
 
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -257,8 +282,12 @@ export default function GroupServicesPage() {
               const isSelected = selectedService === String(service._id);
 
               return (
-                <li
+                <motion.li
                   key={index}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.7, delay: index * 0.15 }}
                   className={`transition-all duration-300 ${
                     isSelected
                       ? "lg:col-span-3 flex flex-col lg:flex-row gap-6 min-h-[620px]"
@@ -323,11 +352,11 @@ export default function GroupServicesPage() {
                       <ClienteReserva selectedService={selectedService} onCloseService={() => setSelectedService(null)} />
                     </div>
                   )}
-                </li>
+                </motion.li>
               );
             })}
         </ul>
-      </div>
+      </motion.div>
     </main>
   );
 }
