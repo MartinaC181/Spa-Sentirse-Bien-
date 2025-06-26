@@ -111,6 +111,17 @@ export default function Navbar() {
             </Link>
           )}
 
+          {user?.role === "cliente" && (
+            <Link href="/cliente/turno">
+              <Button
+                variant="outline"
+                className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white transition-all duration-300 shadow-none hover:shadow-lg hover:scale-105"
+              >
+                Mis Turnos
+              </Button>
+            </Link>
+          )}
+
           {user ? (
             <div className="flex items-center gap-4">
               <span className="text-[#536a86]">
@@ -225,7 +236,20 @@ export default function Navbar() {
                 </Button>
               </Link>
             )}
-
+            {user?.role === "cliente" && (
+              <Link
+                href="/cliente/turno"
+                className="block py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <Button
+                  variant="outline"
+                  className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white w-full transition-all duration-300"
+                >
+                  Mis Turnos
+                </Button>
+              </Link>
+            )}
 
             {user ? (
               <div className="py-2">

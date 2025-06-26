@@ -290,7 +290,7 @@ export default function GroupServicesPage() {
                         {service.nombre}
                       </CardTitle>
                       <span className="block text-lg font-bold text-[#536a86] mt-1">
-                        {service.precio}
+                        ${service.precio}
                       </span>
                       <CardDescription className="mt-2 text-gray-500">
                         {service.descripcion}

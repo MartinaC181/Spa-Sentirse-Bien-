@@ -149,10 +149,16 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
 
   return (
     <>
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reserva de Servicio</DialogTitle>
+      <Dialog open={modalOpen} onOpenChange={(open) => {
+        setModalOpen(open);
+        if (!open) {
+          onCloseService();
+        }
+      }}>
+        <DialogContent className="bg-gradient-to-br from-[#f8f9fa] to-[#e9ecef] border-2 border-[#536a86] rounded-xl shadow-2xl max-w-md mx-auto">
+          <DialogHeader className="text-center pb-3">
+            <DialogTitle className="text-xl font-bold text-[#536a86]">Reserva de Servicio</DialogTitle>
+            <p className="text-[#6c757d] mt-1 text-sm">Completa los datos para tu cita</p>
           </DialogHeader>
           {notification && (
             <div className="absolute left-0 right-0 top-0 z-50 flex justify-center pointer-events-none">
@@ -165,33 +171,46 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fecha" className="text-[#536a86]">Fecha</Label>
-              <Calendar
-                mode="single"
-                selected={fecha}
-                onSelect={setFecha}
-              />
+              <Label htmlFor="fecha" className="text-[#536a86] font-semibold text-xs uppercase tracking-wide">Fecha</Label>
+              <div className="border-2 border-[#536a86] rounded-lg overflow-hidden">
+                <Calendar
+                  mode="single"
+                  selected={fecha}
+                  onSelect={setFecha}
+                  className="bg-white"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hora" className="text-[#536a86]">Hora</Label>
-              <Input
+              <Label htmlFor="hora" className="text-[#536a86] font-semibold text-xs uppercase tracking-wide">Hora</Label>
+              <select
                 id="hora"
-                type="time"
                 value={hora}
                 onChange={(e) => setHora(e.target.value)}
-                className="bg-white border-[#536a86]"
+                className="w-full p-2 rounded-lg border-2 border-[#536a86] bg-white text-[#536a86] font-medium focus:outline-none focus:ring-2 focus:ring-[#536a86] focus:ring-opacity-50 transition-all duration-200"
                 required
-              />
+              >
+                <option value="">Selecciona una hora</option>
+                {Array.from({ length: 13 }, (_, i) => {
+                  const hour = i + 8; // Empezar desde las 8:00
+                  const timeString = hour.toString().padStart(2, '0') + ':00';
+                  return (
+                    <option key={timeString} value={timeString}>
+                      {hour}:00
+                    </option>
+                  );
+                })}
+              </select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="profesional" className="text-[#536a86]">Profesional</Label>
+              <Label htmlFor="profesional" className="text-[#536a86] font-semibold text-xs uppercase tracking-wide">Profesional</Label>
               <select
                 id="profesional"
                 value={profesional}
                 onChange={(e) => setProfesional(e.target.value)}
-                className="w-full p-2 rounded border border-[#536a86] bg-white"
+                className="w-full p-2 rounded-lg border-2 border-[#536a86] bg-white text-[#536a86] font-medium focus:outline-none focus:ring-2 focus:ring-[#536a86] focus:ring-opacity-50 transition-all duration-200"
                 required
               >
                 <option value="">Selecciona un profesional</option>
@@ -203,12 +222,14 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
               </select>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-[#536a86] text-white hover:bg-[#435c74]"
-            >
-              Reservar
-            </Button>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#536a86] to-[#435c74] text-white font-semibold py-2 px-4 rounded-lg hover:from-[#435c74] hover:to-[#536a86] transform hover:scale-105 transition-all duration-200 shadow-lg"
+              >
+                Confirmar Reserva
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
