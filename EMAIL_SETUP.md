@@ -10,9 +10,9 @@ EMAIL_USER=tu-email@gmail.com
 EMAIL_PASS=tu-contraseña-de-aplicación
 
 # Variables existentes del proyecto
-NEXT_PUBLIC_API_USER=https://spa-back-dvdm.onrender.com/api/user
-NEXT_PUBLIC_API_SERVICE=https://spa-back-dvdm.onrender.com/api/service
-NEXT_PUBLIC_API_TURNO=https://spa-back-dvdm.onrender.com/api/turno
+NEXT_PUBLIC_API_USER=
+NEXT_PUBLIC_API_SERVICE=
+NEXT_PUBLIC_API_TURNO=
 ```
 
 ## Configuración de Gmail
@@ -55,10 +55,3 @@ EMAIL_PASS=tu-contraseña
 - **Outlook/Hotmail**: Similar a Gmail
 - **SendGrid**: Servicio profesional para producción
 - **Mailgun**: Otro servicio profesional popular
-
-## Notas Importantes
-
-- Nunca subas tu archivo `.env.local` al repositorio
-- Para producción, usa servicios de email profesionales como SendGrid o Mailgun
-- Las contraseñas de aplicación son más seguras que las contraseñas normales
-- Gmail tiene límites de envío (500 emails por día para cuentas gratuitas) 
