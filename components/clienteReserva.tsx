@@ -100,6 +100,8 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
   // Estado para modal de confirmación
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [datosComprobante, setDatosComprobante] = useState<any>(null);
+  const [enviandoEmail, setEnviandoEmail] = useState(false);
+  const [emailEnviado, setEmailEnviado] = useState(false);
 
   // Cambiar el onChange del input de vencimiento para formatear MM/AA automáticamente
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,6 +215,126 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
     doc.setTextColor(122, 143, 166);
     doc.text('Gracias por confiar en Spa Sentirse Bien', 105, y, { align: 'center' });
     doc.save('comprobante_reserva.pdf');
+  };
+
+  // Función para enviar email
+  const handleEnviarEmail = async () => {
+    if (!datosComprobante) return;
+    
+    setEnviandoEmail(true);
+    setEmailEnviado(false);
+    
+    try {
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #536a86; margin: 0;">Spa Sentirse Bien</h1>
+            <h2 style="color: #536a86; margin: 10px 0;">Comprobante de Reserva</h2>
+          </div>
+          
+          <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="border-bottom: 2px solid #536a86; padding-bottom: 20px; margin-bottom: 20px;">
+              <h3 style="color: #536a86; margin: 0;">Detalles de la Reserva</h3>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <strong style="color: #536a86;">Cliente:</strong> ${datosComprobante.cliente.first_name} ${datosComprobante.cliente.last_name}
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <strong style="color: #536a86;">Email:</strong> ${datosComprobante.cliente.email}
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <strong style="color: #536a86;">Servicio:</strong> ${datosComprobante.servicio?.nombre || ''}
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <strong style="color: #536a86;">Profesional:</strong> ${datosComprobante.profesional ? datosComprobante.profesional.first_name + ' ' + datosComprobante.profesional.last_name : ''}
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <strong style="color: #536a86;">Fecha:</strong> ${datosComprobante.fecha ? datosComprobante.fecha.toLocaleDateString() : ''}
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <strong style="color: #536a86;">Hora:</strong> ${datosComprobante.hora}
+            </div>
+            
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+              ${datosComprobante.descuento > 0 ? 
+                `<div style="color: #28a745; font-weight: bold;">Precio con descuento: $${datosComprobante.precioFinal} (15% OFF)</div>
+                 <div style="color: #6c757d; text-decoration: line-through;">Precio de lista: $${datosComprobante.precioLista}</div>` :
+                `<div style="color: #536a86; font-weight: bold;">Precio: $${datosComprobante.precioLista}</div>`
+              }
+            </div>
+            
+            <div style="text-align: center; color: #6c757d; font-size: 14px; margin-top: 30px;">
+              <p>Gracias por confiar en Spa Sentirse Bien</p>
+              <p>¡Esperamos verte pronto!</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const textContent = `
+        Spa Sentirse Bien - Comprobante de Reserva
+        
+        Cliente: ${datosComprobante.cliente.first_name} ${datosComprobante.cliente.last_name}
+        Email: ${datosComprobante.cliente.email}
+        Servicio: ${datosComprobante.servicio?.nombre || ''}
+        Profesional: ${datosComprobante.profesional ? datosComprobante.profesional.first_name + ' ' + datosComprobante.profesional.last_name : ''}
+        Fecha: ${datosComprobante.fecha ? datosComprobante.fecha.toLocaleDateString() : ''}
+        Hora: ${datosComprobante.hora}
+        ${datosComprobante.descuento > 0 ? 
+          `Precio con descuento: $${datosComprobante.precioFinal} (15% OFF)
+           Precio de lista: $${datosComprobante.precioLista}` :
+          `Precio: $${datosComprobante.precioLista}`
+        }
+        
+        Gracias por confiar en Spa Sentirse Bien
+      `;
+
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: datosComprobante.cliente.email,
+          subject: 'Comprobante de Reserva - Spa Sentirse Bien',
+          html: htmlContent,
+          text: textContent,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setEmailEnviado(true);
+        setNotification({ 
+          message: 'Comprobante enviado a tu correo electrónico', 
+          type: 'success' 
+        });
+        // Ocultar la notificación después de 3 segundos
+        setTimeout(() => {
+          setNotification(null);
+        }, 3000);
+      } else {
+        setNotification({ 
+          message: result.message || 'Error al enviar el email', 
+          type: 'error' 
+        });
+      }
+    } catch (error) {
+      console.error('Error al enviar email:', error);
+      setNotification({ 
+        message: 'Error al enviar el email. Verifica tu conexión a internet.', 
+        type: 'error' 
+      });
+    } finally {
+      setEnviandoEmail(false);
+    }
   };
 
   if (!user) {
@@ -396,7 +518,27 @@ export default function ClienteReserva({ selectedService, onCloseService }: Clie
               Descargar comprobante PDF
             </Button>
             <Button
-              onClick={() => { setConfirmOpen(false); onCloseService(); }}
+              onClick={handleEnviarEmail}
+              disabled={enviandoEmail || emailEnviado}
+              className={`w-full font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-lg mb-2 ${
+                emailEnviado 
+                  ? 'bg-green-600 text-white cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-[#536a86] to-[#435c74] text-white hover:from-[#435c74] hover:to-[#536a86] transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
+            >
+              {enviandoEmail ? 'Enviando...' : emailEnviado ? '✓ Email enviado' : 'Enviar comprobante por email'}
+            </Button>
+            {emailEnviado && (
+              <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-700 text-sm font-medium">✓ Comprobante enviado correctamente a tu correo</p>
+              </div>
+            )}
+            <Button
+              onClick={() => { 
+                setConfirmOpen(false); 
+                onCloseService(); 
+                setEmailEnviado(false);
+              }}
               className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f6fedb] font-semibold py-2 px-4 rounded-lg transition-all duration-200"
             >
               Cerrar

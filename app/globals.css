@@ -114,5 +114,6 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    padding-top: 80px; /* Compensar el navbar fijo */
   }
 }
