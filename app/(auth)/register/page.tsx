@@ -10,6 +10,7 @@ import { Notification } from '@/components/ui/notification';
 import Link from 'next/link';
 import { handleRegister } from './actions';
 import Navbar from '@/components/Navbar';
+import { motion } from 'framer-motion';
 
 export default function RegisterPage() {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -54,94 +55,102 @@ export default function RegisterPage() {
           />
         )}
 
-        <Card className="w-full max-w-md bg-[#bac4e0] border-2 border-[#536a86]">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center text-[#536a86]">
-              Registrarse
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-[#536a86]">Nombre</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  placeholder="Tu nombre"
-                  className="bg-white border-[#536a86]"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8 }}
+          className="w-full max-w-md"
+        >
+          <Card className="w-full bg-[#bac4e0] border-2 border-[#536a86]">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center text-[#536a86]">
+                Registrarse
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={onSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName" className="text-[#536a86]">Nombre</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    placeholder="Tu nombre"
+                    className="bg-white border-[#536a86]"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-[#536a86]">Apellido</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  placeholder="Tu apellido"
-                  className="bg-white border-[#536a86]"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName" className="text-[#536a86]">Apellido</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    placeholder="Tu apellido"
+                    className="bg-white border-[#536a86]"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-[#536a86]">Correo Electrónico</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="ejemplo@correo.com"
-                  className="bg-white border-[#536a86]"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-[#536a86]">Correo Electrónico</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="ejemplo@correo.com"
+                    className="bg-white border-[#536a86]"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#536a86]">Contraseña</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="bg-white border-[#536a86]"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-[#536a86]">Contraseña</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="bg-white border-[#536a86]"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Button
-                  type="submit"
-                  className="w-full bg-[#536a86] text-white hover:bg-[#435570] transition-colors"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Registrando..." : "Registrarse"}
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#536a86] text-white hover:bg-[#435570] transition-colors"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Registrando..." : "Registrarse"}
+                  </Button>
 
-                <Button
-                  type="button"
-                  onClick={() => { router.push('https://spa-back-dvdm.onrender.com/auth/login/google'); }}
-                  className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f0f0f0] flex items-center justify-center gap-2"
-                >
-                  <img src="/google-icon.png" alt="Google" className="w-10 h-10" />
-                  Registrarse con Google
-                </Button>
-              </div>
+                  <Button
+                    type="button"
+                    onClick={() => { router.push('https://spa-back-dvdm.onrender.com/auth/login/google'); }}
+                    className="w-full bg-white border border-[#536a86] text-[#536a86] hover:bg-[#f0f0f0] flex items-center justify-center gap-2"
+                  >
+                    <img src="/google-icon.png" alt="Google" className="w-10 h-10" />
+                    Registrarse con Google
+                  </Button>
+                </div>
 
-              <div className="text-center text-[#536a86]">
-                ¿Ya tienes cuenta?{' '}
-                <Link href="/login" className="text-[#536a86] hover:text-[#435570] font-semibold">
-                  Iniciar Sesión
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                <div className="text-center text-[#536a86]">
+                  ¿Ya tienes cuenta?{' '}
+                  <Link href="/login" className="text-[#536a86] hover:text-[#435570] font-semibold">
+                    Iniciar Sesión
+                  </Link>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </motion.div>
       </main>
     </>
   );

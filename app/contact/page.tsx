@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { motion } from "framer-motion";
 
 
 export default function ContactPage() {
@@ -49,14 +50,24 @@ export default function ContactPage() {
     <main className="min-h-screen bg-[#f6fedb] text-[#536a86] flex flex-col">
       <Navbar />
 
-      <div className="flex flex-col lg:flex-row items-center justify-center flex-grow p-8 gap-16 max-w-7xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        className="flex flex-col lg:flex-row items-center justify-center flex-grow p-8 gap-16 max-w-7xl mx-auto"
+      >
         {/* FORMULARIO DE CONTACTO */}
-        <div className="w-full lg:w-[60%] flex flex-col items-center">
-
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="w-full lg:w-[60%] flex flex-col items-center"
+        >
           <h1 className="text-4xl font-bold mb-8 text-center text-[#536a86]">
             Contáctanos
           </h1>
-
           <div className="w-full">
             <Card className="shadow-2xl rounded-2xl text-[#536a86] text-base">
               <CardHeader>
@@ -97,30 +108,36 @@ export default function ContactPage() {
                       required
                     />
                   </div>
-                    <Button
+                  <Button
                     type="submit"
                     className={`w-full transition-colors ${
                       isComplete
-                      ? "bg-[#bac4e0] hover:bg-[#a9b3e7] text-white"
-                      : "bg-[#bbbbe0] text-[#614f91] cursor-not-allowed"
+                        ? "bg-[#bac4e0] hover:bg-[#a9b3e7] text-white"
+                        : "bg-[#bbbbe0] text-[#614f91] cursor-not-allowed"
                     }`}
                     disabled={!isComplete}
-                    >
+                  >
                     Enviar
-                    </Button>
+                  </Button>
                 </form>
               </CardContent>
             </Card>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="w-full lg:w-[60%] order-1 lg:order-2 flex justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="w-full lg:w-[60%] order-1 lg:order-2 flex justify-center items-center"
+        >
           <img
             src="/logooo.webp"
             alt="Spa"
             className="rounded-full shadow-xl object-cover w-64 h-64 sm:w-72 sm:h-72 lg:w-[400px] lg:h-[400px]"
           />
-        </div>
+        </motion.div>
 
         <Dialog open={showModal} onOpenChange={setShowModal}>
           <DialogContent>
@@ -140,7 +157,7 @@ export default function ContactPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
     </main>
   );
 }

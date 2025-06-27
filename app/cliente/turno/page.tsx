@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Notification } from '@/components/ui/notification';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 export default function VistaTurnosCliente() {
     const { user } = useAuth();
@@ -264,36 +265,63 @@ export default function VistaTurnosCliente() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#f6fedb] to-[#e0e7fa]">
             <Navbar />
-            <div className="max-w-3xl mx-auto p-6">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-extrabold text-[#536a86] tracking-tight drop-shadow">Mis Turnos</h1>
-                </div>
+            <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.8 }}
+                className="max-w-3xl mx-auto p-6"
+            >
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex justify-between items-center mb-8"
+                >
+                    <h1 className="text-4xl font-extrabold text-[#536a86] tracking-tight drop-shadow-lg">
+                        Mis Turnos
+                    </h1>
+                </motion.div>
 
-                <section className="mb-10">
+                <motion.section
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                    className="mb-12"
+                >
                     <h2 className="text-2xl font-semibold text-[#7a8fa6] mb-4 flex items-center gap-2">
                         <span>📅</span> Turnos de Hoy
                     </h2>
                     {turnosHoy.length === 0 && <p className="text-gray-500 text-center">No tenés turnos para hoy.</p>}
-                    <div className="grid gap-4">
-                        {turnosHoy.map((turno) => {
+                    <div className="grid gap-6">
+                        {turnosHoy.map((turno, idx) => {
                             const profesionalId = turno.profesional?._id || turno.profesional;
                             const profesional = profesionales[profesionalId];
                             return (
-                                <div key={turno._id} className="border border-[#c3d0e6] p-5 rounded-xl shadow-md bg-white flex flex-col gap-2 md:flex-row md:items-center md:justify-between transition hover:shadow-lg">
+                                <motion.div
+                                    key={turno._id}
+                                    initial={{ opacity: 0, y: 40 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.2 }}
+                                    transition={{ duration: 0.7, delay: idx * 0.15 }}
+                                    className="border border-[#c3d0e6] p-6 rounded-2xl shadow-xl bg-white flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:shadow-2xl transition-all duration-300"
+                                >
                                     <div className="flex-1 flex flex-col gap-2">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <svg className="w-5 h-5 text-[#7a8fa6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m9 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            <span className="font-semibold text-[#536a86] text-lg">{turno.servicio?.nombre}</span>
+                                            <svg className="w-6 h-6 text-[#7a8fa6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m9 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <span className="font-semibold text-[#536a86] text-xl">{turno.servicio?.nombre}</span>
                                         </div>
-                                        <div className="flex items-center gap-4 text-[#536a86] text-sm">
-                                            <span className="inline-flex items-center gap-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> {turno.fecha ? format(new Date(turno.fecha), 'dd/MM/yyyy') : 'Sin fecha'}</span>
-                                            <span className="inline-flex items-center gap-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg> {turno.hora}</span>
+                                        <div className="flex items-center gap-4 text-[#536a86] text-base">
+                                            <span className="inline-flex items-center gap-1"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> {turno.fecha ? format(new Date(turno.fecha), 'dd/MM/yyyy') : 'Sin fecha'}</span>
+                                            <span className="inline-flex items-center gap-1"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg> {turno.hora}</span>
                                         </div>
                                     </div>
-                                    <div className="flex-1 flex items-center gap-3 bg-[#e0e7fa] rounded-lg px-4 py-3 shadow-sm mt-3 md:mt-0">
-                                        <svg className="w-8 h-8 text-[#536a86]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <div className="flex-1 flex items-center gap-3 bg-[#e0e7fa] rounded-lg px-6 py-4 shadow-sm mt-3 md:mt-0">
+                                        <svg className="w-10 h-10 text-[#536a86]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                         <div>
-                                            <p className="text-[#536a86] font-semibold text-base">
+                                            <p className="text-[#536a86] font-semibold text-lg">
                                                 {profesional ? `${profesional.first_name} ${profesional.last_name}` : "Cargando..."}
                                             </p>
                                             {profesional && (
@@ -310,45 +338,57 @@ export default function VistaTurnosCliente() {
                                             onClick={() => handlePrintIndividual(turno)}
                                             size="sm"
                                             variant="outline"
-                                            className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white transition-all duration-300"
+                                            className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white transition-all duration-300 shadow"
                                         >
-                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                             </svg>
                                             Imprimir
                                         </Button>
                                     </div>
-                                </div>
+                                </motion.div>
                             );
                         })}
                     </div>
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                >
                     <h2 className="text-2xl font-semibold text-[#7a8fa6] mb-4 flex items-center gap-2">
                         <span>⏳</span> Turnos Futuros
                     </h2>
                     {turnosFuturos.length === 0 && <p className="text-gray-500 text-center">No tenés turnos futuros.</p>}
-                    <div className="grid gap-4">
-                        {turnosFuturos.map((turno) => {
+                    <div className="grid gap-6">
+                        {turnosFuturos.map((turno, idx) => {
                             const profesionalId = turno.profesional?._id || turno.profesional;
                             const profesional = profesionales[profesionalId];
                             return (
-                                <div key={turno._id} className="border border-[#c3d0e6] p-5 rounded-xl shadow-md bg-white flex flex-col gap-2 md:flex-row md:items-center md:justify-between transition hover:shadow-lg">
+                                <motion.div
+                                    key={turno._id}
+                                    initial={{ opacity: 0, y: 40 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.2 }}
+                                    transition={{ duration: 0.7, delay: idx * 0.15 }}
+                                    className="border border-[#c3d0e6] p-6 rounded-2xl shadow-xl bg-white flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:shadow-2xl transition-all duration-300"
+                                >
                                     <div className="flex-1 flex flex-col gap-2">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <svg className="w-5 h-5 text-[#7a8fa6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m9 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            <span className="font-semibold text-[#536a86] text-lg">{turno.servicio?.nombre}</span>
+                                            <svg className="w-6 h-6 text-[#7a8fa6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m9 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <span className="font-semibold text-[#536a86] text-xl">{turno.servicio?.nombre}</span>
                                         </div>
-                                        <div className="flex items-center gap-4 text-[#536a86] text-sm">
-                                            <span className="inline-flex items-center gap-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> {turno.fecha ? format(new Date(turno.fecha), 'dd/MM/yyyy') : 'Sin fecha'}</span>
-                                            <span className="inline-flex items-center gap-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg> {turno.hora}</span>
+                                        <div className="flex items-center gap-4 text-[#536a86] text-base">
+                                            <span className="inline-flex items-center gap-1"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> {turno.fecha ? format(new Date(turno.fecha), 'dd/MM/yyyy') : 'Sin fecha'}</span>
+                                            <span className="inline-flex items-center gap-1"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg> {turno.hora}</span>
                                         </div>
                                     </div>
-                                    <div className="flex-1 flex items-center gap-3 bg-[#e0e7fa] rounded-lg px-4 py-3 shadow-sm mt-3 md:mt-0">
-                                        <svg className="w-8 h-8 text-[#536a86]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <div className="flex-1 flex items-center gap-3 bg-[#e0e7fa] rounded-lg px-6 py-4 shadow-sm mt-3 md:mt-0">
+                                        <svg className="w-10 h-10 text-[#536a86]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                         <div>
-                                            <p className="text-[#536a86] font-semibold text-base">
+                                            <p className="text-[#536a86] font-semibold text-lg">
                                                 {profesional ? `${profesional.first_name} ${profesional.last_name}` : "Cargando..."}
                                             </p>
                                             {profesional && (
@@ -365,19 +405,19 @@ export default function VistaTurnosCliente() {
                                             onClick={() => handlePrintIndividual(turno)}
                                             size="sm"
                                             variant="outline"
-                                            className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white transition-all duration-300"
+                                            className="text-[#536a86] border-[#536a86] hover:bg-[#536a86] hover:text-white transition-all duration-300 shadow"
                                         >
-                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                             </svg>
                                             Imprimir
                                         </Button>
                                     </div>
-                                </div>
+                                </motion.div>
                             );
                         })}
                     </div>
-                </section>
+                </motion.section>
 
                 {notification && (
                     <Notification
@@ -386,7 +426,7 @@ export default function VistaTurnosCliente() {
                         onClose={() => setNotification(null)}
                     />
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 }
